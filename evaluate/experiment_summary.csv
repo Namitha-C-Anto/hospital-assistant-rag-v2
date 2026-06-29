@@ -1,0 +1,15 @@
+experiment,run_date,embedding_model,chunk_size,chunk_overlap,top_k,search_type,generation_llm,judge_llm,faithfulness,answer_relevancy,context_precision,context_recall
+all-MiniLM-L6-v2_chunk250_overlap90_k3_similarity,2026-06-27 23:27:46,sentence-transformers/all-MiniLM-L6-v2,250,90,3,similarity,gpt-4o-mini,gpt-4o-mini,1.0,0.915,0.5,1.0
+all-MiniLM-L6-v2_chunk300_overlap90_k3_similarity,2026-06-27 23:29:41,sentence-transformers/all-MiniLM-L6-v2,300,90,3,similarity,gpt-4o-mini,gpt-4o-mini,1.0,0.915,0.5,1.0
+bge-base-en-v1.5_chunk300_overlap90_k3_similarity,2026-06-27 23:36:14,BAAI/bge-base-en-v1.5,300,90,3,similarity,gpt-4o-mini,gpt-4o-mini,1.0,0.915,0.5,1.0
+all-mpnet-base-v2_chunk300_overlap90_k3_similarity,2026-06-27 23:41:44,sentence-transformers/all-mpnet-base-v2,300,90,3,similarity,gpt-4o-mini,gpt-4o-mini,1.0,0.915,0.5,1.0
+all-mpnet-base-v2_chunk300_overlap90_k3_mmr,2026-06-27 23:43:37,sentence-transformers/all-mpnet-base-v2,300,90,3,mmr,gpt-4o-mini,gpt-4o-mini,1.0,0.915,0.333,1.0
+all-mpnet-base-v2_chunk300_overlap90_k3_mmr,2026-06-27 23:50:57,sentence-transformers/all-mpnet-base-v2,300,90,3,mmr,gpt-4o-mini,gpt-4o-mini,1.0,0.915,0.5,1.0
+all-mpnet-base-v2_chunk300_overlap90_k3_similarity,2026-06-27 23:58:46,sentence-transformers/all-mpnet-base-v2,300,90,3,similarity,gpt-4o-mini,gpt-4o-mini,1.0,0.915,0.5,1.0
+all-mpnet-base-v2_chunk300_overlap90_k3_mmr,2026-06-28 00:02:08,sentence-transformers/all-mpnet-base-v2,300,90,3,mmr,gpt-4o-mini,gpt-4o-mini,1.0,0.915,0.333,1.0
+all-mpnet-base-v2_chunk300_overlap90_k3_mmr,2026-06-28 00:06:45,sentence-transformers/all-mpnet-base-v2,300,90,3,mmr,gpt-4o-mini,gpt-4o-mini,1.0,0.915,0.5,1.0
+all-mpnet-base-v2_chunk300_overlap90_k3_mmr,2026-06-28 01:06:01,sentence-transformers/all-mpnet-base-v2,300,90,3,mmr,gpt-4o-mini,gpt-4o-mini,1.0,0.915,1.0,1.0
+all-mpnet-base-v2_chunk300_overlap90_k3_mmr,2026-06-28 01:15:40,sentence-transformers/all-mpnet-base-v2,300,90,3,mmr,gpt-4o-mini,gpt-4o-mini,0.833,0.844,0.833,1.0
+all-mpnet-base-v2_chunk300_overlap90_k3_mmr,2026-06-28 01:33:09,sentence-transformers/all-mpnet-base-v2,300,90,3,mmr,gpt-4o-mini,gpt-4o-mini,0.0,0.827,0.5,1.0
+all-mpnet-base-v2_chunk300_overlap100_k3_mmr,2026-06-28 01:48:23,sentence-transformers/all-mpnet-base-v2,300,100,3,mmr,gpt-4o-mini,gpt-4o-mini,1.0,0.827,0.5,1.0
+all-mpnet-base-v2_chunk300_overlap100_k3_mmr,2026-06-28 01:53:24,sentence-transformers/all-mpnet-base-v2,300,100,3,mmr,gpt-4o-mini,gpt-4o-mini,1.0,0.827,0.5,1.0
