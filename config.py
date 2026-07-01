@@ -12,10 +12,16 @@ load_dotenv(override=True)
 # --------------------------------------------------
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATASET = os.getenv("DATASET", "dataset_v1")
 
-DOCS_PATH = os.path.join(BASE_DIR, "docs")
+DOCS_PATH = os.path.join(BASE_DIR, "docs", DATASET)
 DB_PATH = os.path.join(BASE_DIR, "db", "faiss_index")
+
 EVALUATION_PATH = os.path.join(BASE_DIR, "evaluate")
+RAGAS_RESULTS_PATH = os.path.join(EVALUATION_PATH, "ragas_results", DATASET)
+COMPARISON_PATH = os.path.join(EVALUATION_PATH, "comparisons")
+REPORT_PATH = os.path.join(EVALUATION_PATH, "reports")
+DATASET_PATH = os.path.join(EVALUATION_PATH, "datasets")
 
 # --------------------------------------------------
 # Embedding Model
@@ -36,9 +42,33 @@ CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", 200))
 # --------------------------------------------------
 # Retriever Configuration
 # --------------------------------------------------
-
+# --------------------------------------------------
+# Retriever Configuration
+# --------------------------------------------------
 TOP_K = int(os.getenv("TOP_K", 5))
+FETCH_K = int(os.getenv("FETCH_K", 20))
+
 SEARCH_TYPE = os.getenv("SEARCH_TYPE", "similarity")
+
+LAMBDA_MULT = float(os.getenv("LAMBDA_MULT", 0.5))
+# --------------------------------------------------
+# Reranker Configuration
+# --------------------------------------------------
+
+RERANKER_MODEL = os.getenv(
+    "RERANKER_MODEL",
+    "BAAI/bge-reranker-base",
+)
+
+RERANKER_TOP_N = int(
+    os.getenv("RERANKER_TOP_N", 3)
+)
+
+#--------------------------------------------------Toggle
+USE_RERANKER = os.getenv(
+    "USE_RERANKER",
+    "True"
+).lower() == "true"
 
 # --------------------------------------------------
 # Large Language Model
@@ -46,7 +76,14 @@ SEARCH_TYPE = os.getenv("SEARCH_TYPE", "similarity")
 
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 TEMPERATURE = float(os.getenv("TEMPERATURE", 0.2))
+# --------------------------------------------------
+# Evaluation LLM
+# --------------------------------------------------
 
+JUDGE_MODEL = os.getenv(
+    "JUDGE_MODEL",
+    LLM_MODEL
+)
 # --------------------------------------------------
 # Streamlit Application
 # --------------------------------------------------

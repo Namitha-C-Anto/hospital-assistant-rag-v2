@@ -6,6 +6,7 @@ from rag.retriever import create_retriever
 from llm.llm import get_llm
 from prompts.prompt_template import prompt
 from memory.session_memory import get_chat_history, save_chat
+from rag.reranker import reranker
 
 if not os.path.exists(DB_PATH):
     import build_db
@@ -49,11 +50,17 @@ if question:
         question.strip().upper()
     )
 
+    # Rerank them
+    reranked_results = reranker.compress_documents(
+        documents=results,
+        query=question
+    )
+
     context = "\n\n".join(
         
         doc.page_content 
 
-        for doc in results
+        for doc in reranked_results
     )
 
     messages = prompt.format_messages(
