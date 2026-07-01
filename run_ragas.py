@@ -1,21 +1,18 @@
 import os
-from config import DB_PATH, OPENAI_API_KEY, GROQ_API_KEY, CHUNK_SIZE, CHUNK_OVERLAP, TOP_K, EMBEDDING_MODEL, SEARCH_TYPE, LLM_MODEL
+from config import OPENAI_API_KEY, CHUNK_SIZE, CHUNK_OVERLAP, TOP_K,FETCH_K, LAMBDA_MULT, USE_RERANKER, RERANKER_MODEL, RERANKER_TOP_N, EMBEDDING_MODEL, SEARCH_TYPE, LLM_MODEL, JUDGE_MODEL, DATASET, TEMPERATURE
 from datetime import datetime
 from datasets import Dataset
 import pandas as pd
- 
 from rag.vectorstore import load_vectorstore
 from rag.retriever import create_retriever
-from llm.llm import get_llm
 from prompts.prompt_template import prompt
 from evaluate.test_questions import TEST_DATA
 from ragas import evaluate 
 from ragas.embeddings import LangchainEmbeddingsWrapper
-from ragas.llms import llm_factory
-from openai import OpenAI
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import ChatOpenAI
 from ragas.llms import LangchainLLMWrapper
+from rag.reranker import reranker
  
 from ragas.metrics import (
     Faithfulness,
@@ -30,24 +27,17 @@ from ragas.metrics import (
 
 vectorstore = load_vectorstore()
 retriever = create_retriever(vectorstore)
- 
-#ragas_llm = LangchainLLMWrapper(app_llm)
-# 1. Initialize the standard OpenAI client
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
- 
 
-JUDGE_MODEL = "gpt-4o-mini"
+#JUDGE_MODEL = LLM_MODEL
 judge_llm = ChatOpenAI(
     model=JUDGE_MODEL,
     api_key=OPENAI_API_KEY,
 )
 
-ragas_llm = LangchainLLMWrapper(judge_llm)
-# # 2. Use llm_factory to create a compatible InstructorLLM instance
-# ragas_llm = llm_factory("gpt-4o-mini", client=openai_client)
+ragas_llm = LangchainLLMWrapper(judge_llm) 
 
 hf_embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
+    model_name=EMBEDDING_MODEL
 )
 
 ragas_embeddings = LangchainEmbeddingsWrapper(
@@ -57,9 +47,8 @@ ragas_embeddings = LangchainEmbeddingsWrapper(
 # 2. Run RAG pipeline on test questions
 # -------------------------------------------------
 app_llm = ChatOpenAI(
-    model= "gpt-5-nano",
+    model= LLM_MODEL,
     api_key= OPENAI_API_KEY,
-    #temperature=0.1
     )
 
 questions = []
@@ -69,40 +58,81 @@ ground_truths = []
 
 print("Running RAG on test questions...\n")
 
+DEBUG = False
+
 for item in TEST_DATA:
     question = item["question"]
+    try:  
 
-    docs = retriever.invoke(question.strip())
+        docs = retriever.invoke(question.strip())
 
-    retrieved_contexts = [
-        doc.page_content for doc in docs
-    ]
+        # Rerank them
+        if USE_RERANKER:
+            reranked_results = reranker.compress_documents(
+                documents=docs,
+                query=question
+            )
+        else:
+            reranked_results = docs[:TOP_K]
 
-    context_text = "\n\n".join(retrieved_contexts)
+        retrieved_contexts = [
+            doc.page_content for doc in reranked_results
+        ]
+        
+        debug_contexts  = [
+        {
+            "content": doc.page_content,
+            "metadata": doc.metadata
+        }
+        for doc in reranked_results
+        ]
 
-    messages = prompt.format_messages(
-        context=context_text,
-        question=question,
-        chat_history=""
-    )
+        context_text = "\n\n---\n\n".join(retrieved_contexts)
 
-    response = app_llm.invoke(messages)
+        messages = prompt.format_messages(
+            context=context_text,
+            question=question,
+            chat_history=""
+        )
 
-    answer = (
-        response.content
-        if hasattr(response, "content")
-        else str(response)
-    )
+        response = app_llm.invoke(messages)
 
-    questions.append(question)
-    #answers.append(answer)
-    answers.append(item["ground_truth"])
-    contexts.append(retrieved_contexts)
-    ground_truths.append(item["ground_truth"])
+        answer = (
+            response.content
+            if hasattr(response, "content")
+            else str(response)
+        )
 
-    print(f"✅ Q: {question}")
-    print(f"   A: {answer[:100]}...\n")
+        questions.append(question)
+        answers.append(answer)
+        #answers.append(item["ground_truth"])
+        contexts.append(retrieved_contexts)
+        ground_truths.append(item["ground_truth"])
 
+        if DEBUG:
+            print("="*80)
+            print("QUESTION")
+            print(question)
+
+            print("\nRESPONSE")
+            print(answer)
+
+            print("\nREFERENCE")
+            print(item["ground_truth"])
+
+            print("\nCONTEXT")
+            print(context_text)
+            print("="*80)
+
+            for i, ctx in enumerate(debug_contexts, 1):
+                print(f"\nChunk {i}")
+                print(ctx["metadata"])
+                print(ctx["content"])
+            
+    except Exception as e:
+        print(f"Failed question: {question}")
+        print(e)
+            
 # -------------------------------------------------
 # 3. Build RAGAS dataset
 # -------------------------------------------------
@@ -147,10 +177,18 @@ metrics = [
 
 print("\nEvaluating with RAGAS...\n")
 
-results = evaluate(
-    dataset=ragas_dataset,
-    metrics=metrics,
-)
+if not questions:
+    raise RuntimeError("No successful test cases were collected.")
+
+try:
+    results = evaluate(
+        dataset=ragas_dataset,
+        metrics=metrics,
+    )
+except Exception as e:
+    print("RAGAS evaluation failed")
+    print(e)
+    raise
 # -------------------------------------------------
 # 6. Display results
 # -------------------------------------------------
@@ -165,8 +203,18 @@ EXPERIMENT_NAME = (
     f"_chunk{CHUNK_SIZE}"
     f"_overlap{CHUNK_OVERLAP}"
     f"_k{TOP_K}"
+    f"_fetch{FETCH_K}"
+    f"_lambda{LAMBDA_MULT}"
     f"_{SEARCH_TYPE}"
 )
+
+if USE_RERANKER:
+    EXPERIMENT_NAME += (
+        f"_rerank{RERANKER_TOP_N}"
+        f"_{RERANKER_MODEL.split('/')[-1]}"
+    )
+else:
+    EXPERIMENT_NAME += "_noreranker"
 
 df["experiment"] = EXPERIMENT_NAME
 
@@ -174,6 +222,11 @@ df["run_date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 df["chunk_size"] = CHUNK_SIZE
 df["chunk_overlap"] = CHUNK_OVERLAP
 df["top_k"] = TOP_K
+df["fetch_k"] = FETCH_K
+df["lambda_mult"] = LAMBDA_MULT
+df["use_reranker"] = USE_RERANKER
+df["reranker_model"] = RERANKER_MODEL
+df["reranker_top_n"] = RERANKER_TOP_N
 df["embedding_model"] = EMBEDDING_MODEL
 df["search_type"] = SEARCH_TYPE
 df["generation_llm"] = LLM_MODEL
@@ -188,8 +241,8 @@ columns_to_show = [
     col for col in [
         "user_input",
         "faithfulness",
-        "response_relevancy",
-        "llm_context_precision_with_reference",
+        "answer_relevancy",
+        "context_precision",
         "context_recall",
     ]
     if col in df.columns
@@ -230,17 +283,54 @@ print(df[[
     "faithfulness"
 ]])
 
-#--------Summary CSV--------------------------
 summary_row = {
+    # -----------------------------
+    # Experiment Information
+    # -----------------------------
     "experiment": EXPERIMENT_NAME,
     "run_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+
+    # -----------------------------
+    # Dataset
+    # -----------------------------
+    "dataset": DATASET,
+
+    # -----------------------------
+    # Embedding
+    # -----------------------------
     "embedding_model": EMBEDDING_MODEL,
+
+    # -----------------------------
+    # Chunking
+    # -----------------------------
     "chunk_size": CHUNK_SIZE,
     "chunk_overlap": CHUNK_OVERLAP,
-    "top_k": TOP_K,
+
+    # -----------------------------
+    # Retrieval
+    # -----------------------------
     "search_type": SEARCH_TYPE,
+    "top_k": TOP_K,
+    "fetch_k": FETCH_K,
+    "lambda_mult": LAMBDA_MULT,
+
+    # -----------------------------
+    # Reranker
+    # -----------------------------
+    "use_reranker": USE_RERANKER,
+    "reranker_model": RERANKER_MODEL if USE_RERANKER else "None",
+    "reranker_top_n": RERANKER_TOP_N if USE_RERANKER else "None",
+
+    # -----------------------------
+    # LLM
+    # -----------------------------
     "generation_llm": LLM_MODEL,
     "judge_llm": JUDGE_MODEL,
+    "temperature": TEMPERATURE,
+
+    # -----------------------------
+    # Average RAGAS Scores
+    # -----------------------------
     "faithfulness": round(df["faithfulness"].mean(), 3),
     "answer_relevancy": round(df["answer_relevancy"].mean(), 3),
     "context_precision": round(df["context_precision"].mean(), 3),
@@ -266,7 +356,3 @@ summary_df.to_csv(summary_path, index=False)
 print("\n========== AVERAGE SCORES ==========")
 for metric, score in summary.items():
     print(f"{metric}: {score}")
-
-for i, doc in enumerate(docs, start=1):
-    print(f"\n===== Rank {i} =====")
-    print(doc.page_content[:300])   # first 300 characters
