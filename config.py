@@ -16,6 +16,7 @@ DATASET = os.getenv("DATASET", "dataset_v1")
 
 DOCS_PATH = os.path.join(BASE_DIR, "docs", DATASET)
 DB_PATH = os.path.join(BASE_DIR, "db", "faiss_index")
+CHUNKS_PATH = os.path.join(BASE_DIR, "db", "chunks")
 
 EVALUATION_PATH = os.path.join(BASE_DIR, "evaluate")
 RAGAS_RESULTS_PATH = os.path.join(EVALUATION_PATH, "ragas_results", DATASET)

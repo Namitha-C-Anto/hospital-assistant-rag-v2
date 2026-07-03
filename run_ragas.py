@@ -27,6 +27,8 @@ from ragas.metrics import (
 
 vectorstore = load_vectorstore()
 retriever = create_retriever(vectorstore)
+faiss_retriever = retriever["faiss"]
+bm25_retriever = retriever["bm25"]  
 
 #JUDGE_MODEL = LLM_MODEL
 judge_llm = ChatOpenAI(
@@ -64,16 +66,39 @@ for item in TEST_DATA:
     question = item["question"]
     try:  
 
-        docs = retriever.invoke(question.strip())
+        # docs = retriever.invoke(question.strip())
+        faiss_docs = faiss_retriever.invoke(question.strip())
+        bm25_docs = bm25_retriever.invoke(question.strip())
+
+        print("\n========== FAISS ==========\n")
+
+        for i, doc in enumerate(faiss_docs, start=1):
+            print(f"Rank: {i}")
+            print(f"Source: {doc.metadata.get('source')}")
+            print(f"Page: {doc.metadata.get('page')}")
+            print(doc.page_content)
+            print("-" * 80)
+
+        print("\n========== BM25 ==========\n")
+
+        for i, doc in enumerate(bm25_docs, start=1):
+            print(f"Rank: {i}")
+            print(f"Source: {doc.metadata.get('source')}")
+            print(f"Page: {doc.metadata.get('page')}")
+            print(doc.page_content)
+            print("-" * 80)
+            
+        print("FAISS:", len(faiss_docs))
+        print("BM25 Results:", len(bm25_docs))
 
         # Rerank them
         if USE_RERANKER:
             reranked_results = reranker.compress_documents(
-                documents=docs,
+                documents=faiss_docs,
                 query=question
             )
         else:
-            reranked_results = docs[:TOP_K]
+            reranked_results = faiss_docs[:TOP_K]
 
         retrieved_contexts = [
             doc.page_content for doc in reranked_results
