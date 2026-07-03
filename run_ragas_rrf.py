@@ -1,5 +1,5 @@
 import os
-from config import OPENAI_API_KEY, CHUNK_SIZE, CHUNK_OVERLAP, TOP_K,FETCH_K, LAMBDA_MULT, USE_RERANKER, RERANKER_MODEL, RERANKER_TOP_N, EMBEDDING_MODEL, SEARCH_TYPE, LLM_MODEL, JUDGE_MODEL, DATASET, TEMPERATURE
+from config import OPENAI_API_KEY, CHUNK_SIZE, CHUNK_OVERLAP, TOP_K,FETCH_K, LAMBDA_MULT, USE_RERANKER, RERANKER_MODEL, EMBEDDING_MODEL, SEARCH_TYPE, LLM_MODEL, JUDGE_MODEL, DATASET, TEMPERATURE
 from datetime import datetime
 from datasets import Dataset
 import pandas as pd
@@ -28,7 +28,8 @@ from ragas.metrics import (
 
 vectorstore = load_vectorstore()
 retriever = create_retriever(vectorstore)
-faiss_retriever = retriever["faiss"] 
+faiss_retriever = retriever["faiss"]
+bm25_retriever = retriever["bm25"]  
 
 #JUDGE_MODEL = LLM_MODEL
 judge_llm = ChatOpenAI(
@@ -64,13 +65,38 @@ for item in TEST_DATA:
     try:  
  
         faiss_docs = faiss_retriever.invoke(question.strip())
-        #bm25_docs = bm25_retriever.invoke(question.strip())
+        bm25_docs = bm25_retriever.invoke(question.strip())
 
         print("FAISS:", len(faiss_docs))
-        #print("BM25 Results:", len(bm25_docs))
+        print("BM25 Results:", len(bm25_docs))
 
-        docs = faiss_docs
+        docs = reciprocal_rank_fusion(
+            [
+                faiss_docs,
+                bm25_docs,
+            ],
+            top_n=TOP_K,
+        )
+        seen = set()
 
+        ##--------------------DEDUPLICATION
+        seen = set()
+        unique_docs = []
+
+        for doc in docs:
+            key = (
+                doc.metadata["source"],
+                doc.metadata["page"],
+                doc.page_content[:100]
+            )
+
+            if key not in seen:
+                seen.add(key)
+                unique_docs.append(doc)
+
+        docs = unique_docs
+
+        #------------------RERANK
         # Rerank them
         if USE_RERANKER:
             reranked_results = reranker.compress_documents(
@@ -123,6 +149,25 @@ for item in TEST_DATA:
                             for i, doc in enumerate(faiss_docs)
                         ],
 
+                        "bm25": [
+                            {
+                                "rank": i + 1,
+                                "source": doc.metadata.get("source"),
+                                "page": doc.metadata.get("page"),
+                                "content": doc.page_content,
+                            }
+                            for i, doc in enumerate(bm25_docs)
+                        ],
+
+                        "rrf": [
+                            {
+                                "rank": i + 1,
+                                "source": doc.metadata.get("source"),
+                                "page": doc.metadata.get("page"),
+                                "content": doc.page_content,
+                            }
+                            for i, doc in enumerate(docs)
+                        ],
 
                         "reranked": [
                             {

@@ -14,13 +14,20 @@ TEST_DATA = [
 #     "notes": "Basic document understanding."
 # },
 
+# {
+#     "id": "Q002",
+#     "question": "What are the five strategic objectives of an effective admissions and discharge policy?",
+#     "ground_truth": "The objectives are to provide integrated patient-centred care, maximize clinical and organizational effectiveness, establish integrated acute care networks, ensure local access with high-quality care, and acquire admissions data for planning and monitoring.",
+#     "source_doc": "admission_and_discharge_guidelines_2003.pdf",
+#     "notes": "Multi-point extraction."
+# },
 {
     "id": "Q002",
-    "question": "What are the five strategic objectives of an effective admissions and discharge policy?",
-    "ground_truth": "The objectives are to provide integrated patient-centred care, maximize clinical and organizational effectiveness, establish integrated acute care networks, ensure local access with high-quality care, and acquire admissions data for planning and monitoring.",
+    "question": "According to the guidelines, what are the responsibilities of the Hospital Bed Manager (HBM)?",
+    "ground_truth": "The Hospital Bed Manager should oversee bed management, implement the bed management policy, coordinate the bed management team, operate the service continuously (24/7), report to senior management, continuously analyse bed usage and provide reports and forecasts, centralise bed allocation, and ensure patients are accommodated in the most appropriate beds.",
     "source_doc": "admission_and_discharge_guidelines_2003.pdf",
-    "notes": "Multi-point extraction."
-},
+    "notes": "Uses the acronym HBM and the exact role title, making it a strong BM25 test case."
+}
 
 # {
 #     "id": "Q003",
