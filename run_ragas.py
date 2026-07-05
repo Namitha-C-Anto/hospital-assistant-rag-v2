@@ -70,6 +70,22 @@ for item in TEST_DATA:
         #print("BM25 Results:", len(bm25_docs))
 
         docs = faiss_docs
+        ##--------------------DEDUPLICATION
+        seen = set()
+        unique_docs = []
+
+        for doc in docs:
+            key = (
+                doc.metadata["source"],
+                doc.metadata["page"],
+                doc.page_content[:100]
+            )
+
+            if key not in seen:
+                seen.add(key)
+                unique_docs.append(doc)
+
+        docs = unique_docs
 
         # Rerank them
         if USE_RERANKER:

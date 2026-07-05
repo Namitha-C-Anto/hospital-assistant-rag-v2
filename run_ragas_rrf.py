@@ -1,10 +1,10 @@
 import os
-from config import OPENAI_API_KEY, CHUNK_SIZE, CHUNK_OVERLAP, TOP_K,FETCH_K, LAMBDA_MULT, USE_RERANKER, RERANKER_MODEL, EMBEDDING_MODEL, SEARCH_TYPE, LLM_MODEL, JUDGE_MODEL, DATASET, TEMPERATURE
+from config import OPENAI_API_KEY, CHUNK_SIZE, CHUNK_OVERLAP, TOP_K,FETCH_K, LAMBDA_MULT, USE_RERANKER, RERANKER_MODEL, RERANKER_TOP_N, EMBEDDING_MODEL, SEARCH_TYPE, LLM_MODEL, JUDGE_MODEL, DATASET, TEMPERATURE, RETRIEVAL_MODE
 from datetime import datetime
 from datasets import Dataset
 import pandas as pd
 from rag.vectorstore import load_vectorstore
-from rag.retriever import create_retriever
+from rag.retriever import create_retriever, retrieve_documents
 from prompts.prompt_template import prompt
 from evaluate.test_questions import TEST_DATA
 from ragas import evaluate 
@@ -64,30 +64,28 @@ for item in TEST_DATA:
     question = item["question"]
     try:  
  
-        faiss_docs = faiss_retriever.invoke(question.strip())
-        bm25_docs = bm25_retriever.invoke(question.strip())
-
-        print("FAISS:", len(faiss_docs))
-        print("BM25 Results:", len(bm25_docs))
-
-        docs = reciprocal_rank_fusion(
-            [
-                faiss_docs,
-                bm25_docs,
-            ],
-            top_n=TOP_K,
-        )
-        seen = set()
+        if RETRIEVAL_MODE == "faiss":
+            docs = retrieve_documents(question, retriever)
+        else:
+            docs = retrieve_documents(
+                question,
+                retriever["faiss"],
+                retriever["bm25"],
+            )
 
         ##--------------------DEDUPLICATION
+        import hashlib
+
         seen = set()
         unique_docs = []
 
         for doc in docs:
+            content_hash = hashlib.md5(doc.page_content.encode()).hexdigest()
+ 
             key = (
                 doc.metadata["source"],
                 doc.metadata["page"],
-                doc.page_content[:100]
+                doc.metadata.get("chunk_id", hash(doc.page_content))
             )
 
             if key not in seen:
