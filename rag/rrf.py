@@ -1,14 +1,22 @@
 from collections import defaultdict
-
+from langchain_core.documents import Document
 
 def reciprocal_rank_fusion(
-    ranked_lists,
-    k=60,
-    top_n=15,
-):
+    ranked_lists: list[list[Document]],
+    k: int = 60,
+    top_n: int = 15,
+) -> list[Document]:
+    
     """
-    ranked_lists: List[List[Document]]
-    Returns fused list of Documents.
+    Fuse multiple ranked document lists using Reciprocal Rank Fusion (RRF).
+
+    Args:
+        ranked_lists: Ranked lists of retrieved documents.
+        k: RRF ranking constant.
+        top_n: Number of documents to return.
+
+    Returns:
+        A fused ranked list of unique documents.
     """
 
     scores = defaultdict(float)

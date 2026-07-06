@@ -10,9 +10,22 @@ from config import (
 from langchain_community.retrievers import BM25Retriever
 from rag.storage import load_chunks
 from rag.rrf import reciprocal_rank_fusion
+from typing import Optional
+from langchain_core.documents import Document
+from langchain_core.retrievers import BaseRetriever
+ 
 
+def create_retriever(
+    vectorstore,
+) -> dict[str, Optional[BaseRetriever]]:
+    """
+    Create retrievers based on the configured retrieval mode.
 
-def create_retriever(vectorstore):
+    Returns:
+        Dictionary containing:
+            - "faiss": FAISS retriever
+            - "bm25": BM25 retriever or None
+    """
 
     if RETRIEVAL_MODE not in {"faiss", "hybrid"}:
         raise ValueError(f"Unknown retrieval mode: {RETRIEVAL_MODE}")
@@ -26,13 +39,13 @@ def create_retriever(vectorstore):
         },
     )
 
-    if RETRIEVAL_MODE == "faiss":
-        return faiss_retriever
+    bm25_retriever = None
+    
+    if RETRIEVAL_MODE == "hybrid":
+        documents = load_chunks(CHUNKS_PATH)
 
-    documents = load_chunks(CHUNKS_PATH)
-
-    bm25_retriever = BM25Retriever.from_documents(documents)
-    bm25_retriever.k = TOP_K
+        bm25_retriever = BM25Retriever.from_documents(documents)
+        bm25_retriever.k = TOP_K
 
     return {
         "faiss": faiss_retriever,
@@ -41,7 +54,26 @@ def create_retriever(vectorstore):
 
 ##-----------------------------------------------------------------------------------------
 
-def retrieve_documents(question, faiss_retriever, bm25_retriever=None):
+def retrieve_documents(
+    question: str,
+    faiss_retriever: BaseRetriever,
+    bm25_retriever: Optional[BaseRetriever] = None,
+) -> list[Document]:
+    """
+    Retrieve documents using the configured retrieval mode.
+
+    - FAISS mode: returns vector search results.
+    - Hybrid mode: combines FAISS and BM25 using Reciprocal Rank Fusion (RRF).
+
+    Args:
+        question: User query.
+        faiss_retriever: FAISS retriever.
+        bm25_retriever: BM25 retriever (required for hybrid mode).
+
+    Returns:
+        List of retrieved documents.
+    """
+
     question = question.strip()
 
     if RETRIEVAL_MODE == "faiss":

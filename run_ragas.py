@@ -1,10 +1,11 @@
 import os
-from config import OPENAI_API_KEY, CHUNK_SIZE, CHUNK_OVERLAP, TOP_K,FETCH_K, LAMBDA_MULT, USE_RERANKER, RERANKER_MODEL, RERANKER_TOP_N, EMBEDDING_MODEL, SEARCH_TYPE, LLM_MODEL, JUDGE_MODEL, DATASET, TEMPERATURE
+import time
+from config import OPENAI_API_KEY, CHUNK_SIZE, CHUNK_OVERLAP, TOP_K,FETCH_K, LAMBDA_MULT, USE_RERANKER, RERANKER_MODEL, RERANKER_TOP_N, EMBEDDING_MODEL, SEARCH_TYPE, LLM_MODEL, JUDGE_MODEL, DATASET, TEMPERATURE, RETRIEVAL_MODE, EVALUATION_PATH, RAGAS_RESULTS_PATH, DEBUG
 from datetime import datetime
 from datasets import Dataset
 import pandas as pd
 from rag.vectorstore import load_vectorstore
-from rag.retriever import create_retriever
+from rag.retriever import create_retriever, retrieve_documents
 from prompts.prompt_template import prompt
 from evaluate.test_questions import TEST_DATA
 from ragas import evaluate 
@@ -12,23 +13,27 @@ from ragas.embeddings import LangchainEmbeddingsWrapper
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import ChatOpenAI
 from ragas.llms import LangchainLLMWrapper
-from rag.reranker import reranker
-from rag.rrf import reciprocal_rank_fusion
-import json 
+from rag.reranker import reranker 
+import json  
 from ragas.metrics import (
     Faithfulness,
     ResponseRelevancy,
     ContextPrecision,  # Newer equivalent of ContextPrecisionWithReference
     ContextRecall
 )
+from utils.logger import logger 
+from utils.serialization import serialize_documents
 
 # -------------------------------------------------
 # 1. Load RAG components
 # -------------------------------------------------
 
 vectorstore = load_vectorstore()
+
 retriever = create_retriever(vectorstore)
-faiss_retriever = retriever["faiss"] 
+
+faiss_retriever = retriever["faiss"]
+bm25_retriever = retriever["bm25"]
 
 #JUDGE_MODEL = LLM_MODEL
 judge_llm = ChatOpenAI(
@@ -55,30 +60,32 @@ app_llm = ChatOpenAI(
 
 evaluation_results = []
 
-print("Running RAG on test questions...\n")
-
-DEBUG = False
-
-for item in TEST_DATA:
-    question = item["question"]
-    try:  
+logger.info("Running RAG on test questions...")
  
-        faiss_docs = faiss_retriever.invoke(question.strip())
-        #bm25_docs = bm25_retriever.invoke(question.strip())
+for item in TEST_DATA:
+    
+    question = item["question"]
+    pipeline_start = time.perf_counter()
 
-        print("FAISS:", len(faiss_docs))
-        #print("BM25 Results:", len(bm25_docs))
+    try:  
+        retrieval_start = time.perf_counter()
+        docs = retrieve_documents(
+                question,
+                faiss_retriever,
+                bm25_retriever,
+            )
+        retrieval_time = round(time.perf_counter() - retrieval_start, 4)
 
-        docs = faiss_docs
         ##--------------------DEDUPLICATION
         seen = set()
         unique_docs = []
 
         for doc in docs:
+            
             key = (
                 doc.metadata["source"],
                 doc.metadata["page"],
-                doc.page_content[:100]
+                doc.metadata.get("chunk_id", doc.page_content)
             )
 
             if key not in seen:
@@ -87,12 +94,18 @@ for item in TEST_DATA:
 
         docs = unique_docs
 
+        #------------------RERANK
+        
+        reranker_time = 0
         # Rerank them
         if USE_RERANKER:
+            reranker_start = time.perf_counter()
+
             reranked_results = reranker.compress_documents(
                 documents=docs,
                 query=question
             )
+            reranker_time = round(time.perf_counter() - reranker_start,4)
         else:
             reranked_results = docs[:TOP_K]
 
@@ -110,13 +123,18 @@ for item in TEST_DATA:
 
         context_text = "\n\n---\n\n".join(retrieved_contexts)
 
+        prompt_start = time.perf_counter()
+
         messages = prompt.format_messages(
             context=context_text,
             question=question,
             chat_history=""
         )
+        prompt_time = round(time.perf_counter() - prompt_start, 4)
 
+        generation_start = time.perf_counter()
         response = app_llm.invoke(messages)
+        generation_time = round(time.perf_counter() - generation_start,4)
 
         answer = (
             response.content
@@ -124,62 +142,77 @@ for item in TEST_DATA:
             else str(response)
         )
 
+        usage = getattr(response, "response_metadata", {}).get("token_usage", {})
+
+        #-------------RESULT JSON
+        
+        retrieval = {
+            "retrieved_documents":serialize_documents(docs)
+        }
+
+        if USE_RERANKER:
+            retrieval["reranked"] = serialize_documents(reranked_results)
+
+        pipeline_time = round(time.perf_counter() - pipeline_start,4)
+
         evaluation_results.append(
                 {
                     "question": question,
+                    "latency": {
+                        "retrieval_seconds": retrieval_time,
+                        "reranker_seconds": reranker_time,
+                        "generation_seconds": generation_time,
+                        "pipeline_seconds": pipeline_time,
+                        "prompt_seconds": prompt_time
+                        },
+                    "retrieval_stats": {
+                        "retrieved": len(docs),
+                        "after_reranker": len(reranked_results),
+                        },
 
-                    "retrieval": {
-                        "faiss": [
-                            {
-                                "rank": i + 1,
-                                "source": doc.metadata.get("source"),
-                                "page": doc.metadata.get("page"),
-                                "content": doc.page_content,
-                            }
-                            for i, doc in enumerate(faiss_docs)
-                        ],
-
-
-                        "reranked": [
-                            {
-                                "rank": i + 1,
-                                "source": doc.metadata.get("source"),
-                                "page": doc.metadata.get("page"),
-                                "content": doc.page_content,
-                            }
-                            for i, doc in enumerate(reranked_results)
-                        ],
-                    },
-
+                    "retrieval": retrieval,
+                    "usage": {
+                        "prompt_tokens": usage.get("prompt_tokens"),
+                        "completion_tokens": usage.get("completion_tokens"),
+                        "total_tokens": usage.get("total_tokens"),
+                        },
                     "answer": answer,
                     "reference": item["ground_truth"],
+                    
                 }
             )
-
+        logger.info(
+            f"{question} | "
+            f"Retrieval={retrieval_time}s | "
+            f"Reranker={reranker_time}s | "
+            f"Generation={generation_time}s | "
+            f"Pipeline={pipeline_time}s"
+        )
+            
         if DEBUG:
-            print("="*80)
-            print("QUESTION")
-            print(question)
+            logger.info("="*80)
+            logger.info("QUESTION")
+            logger.info(question)
 
-            print("\nRESPONSE")
-            print(answer)
+            logger.info("\nRESPONSE")
+            logger.info(answer)
 
-            print("\nREFERENCE")
-            print(item["ground_truth"])
+            logger.info("\nREFERENCE")
+            logger.info(item["ground_truth"])
 
-            print("\nCONTEXT")
-            print(context_text)
-            print("="*80)
+            logger.info("\nCONTEXT")
+            logger.info(context_text)
+            logger.info("="*80)
 
             for i, ctx in enumerate(debug_contexts, 1):
-                print(f"\nChunk {i}")
-                print(ctx["metadata"])
-                print(ctx["content"])
+                logger.info(f"\nChunk {i}")
+                logger.info(ctx["metadata"])
+                logger.info(ctx["content"])
             
     except Exception as e:
-        print(f"Failed question: {question}")
-        print(e)
-            
+        logger.exception(f"Failed question: {question}")
+        logger.exception(e)
+
 # -------------------------------------------------
 # 3. Build RAGAS dataset
 # -------------------------------------------------
@@ -199,7 +232,11 @@ ragas_dataset = Dataset.from_dict(
         "retrieved_contexts": [
             [
                 chunk["content"]
-                for chunk in x["retrieval"]["reranked"]
+                for chunk in (
+                    x["retrieval"]["reranked"]
+                    if USE_RERANKER
+                    else x["retrieval"]["retrieved_documents"]
+                )
             ]
             for x in evaluation_results
         ],
@@ -224,26 +261,29 @@ metrics = [
 # 5. Run evaluation
 # -------------------------------------------------
 
-print("\nEvaluating with RAGAS...\n")
-
+logger.info("Evaluating with RAGAS...")
 if not evaluation_results:
     raise RuntimeError("No successful test cases were collected.")
 
 try:
+    ragas_start = time.perf_counter()
+    
     results = evaluate(
         dataset=ragas_dataset,
         metrics=metrics,
     )
+    ragas_time = round(time.perf_counter() - ragas_start, 4)
+
 except Exception as e:
-    print("RAGAS evaluation failed")
-    print(e)
+    logger.exception("RAGAS evaluation failed")
+    logger.exception(e)
     raise
 # -------------------------------------------------
 # 6. Display results
 # -------------------------------------------------
 
-print("\n========== RAGAS SCORES ==========")
-print(results)
+logger.info("========== RAGAS SCORES ==========")
+logger.info(results)
 
 df = results.to_pandas()
 for result, (_, row) in zip(evaluation_results, df.iterrows()):
@@ -254,69 +294,67 @@ for result, (_, row) in zip(evaluation_results, df.iterrows()):
         "context_precision": row["context_precision"],
         "context_recall": row["context_recall"],
     }
+    
+RUN_DATE = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 EXPERIMENT_NAME = (
-    f"{EMBEDDING_MODEL.split('/')[-1]}"
-    f"_chunk{CHUNK_SIZE}"
-    f"_overlap{CHUNK_OVERLAP}"
-    f"_k{TOP_K}"
-    f"_fetch{FETCH_K}"
-    f"_lambda{LAMBDA_MULT}"
-    f"_{SEARCH_TYPE}"
+    f"{RETRIEVAL_MODE}_{RUN_DATE}_"
+    f"{'reranker' if USE_RERANKER else 'no_reranker'}"
 )
-
-if USE_RERANKER:
-    EXPERIMENT_NAME += (
-        f"_rerank{RERANKER_TOP_N}"
-        f"_{RERANKER_MODEL.split('/')[-1]}"
-    )
-else:
-    EXPERIMENT_NAME += "_noreranker"
+logger.info(f"Experiment: {EXPERIMENT_NAME}")
 
 experiment_info = {
     "experiment": EXPERIMENT_NAME,
-    "run_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    "run_date": RUN_DATE,
 
     "dataset": DATASET,
+    "temperature": TEMPERATURE,
+
+    "retrieval_mode": RETRIEVAL_MODE,
+    "search_type": SEARCH_TYPE,
 
     "embedding_model": EMBEDDING_MODEL,
 
     "chunk_size": CHUNK_SIZE,
     "chunk_overlap": CHUNK_OVERLAP,
 
-    "search_type": SEARCH_TYPE,
     "top_k": TOP_K,
     "fetch_k": FETCH_K,
     "lambda_mult": LAMBDA_MULT,
 
     "use_reranker": USE_RERANKER,
-    "reranker_model": RERANKER_MODEL,
-    "reranker_top_n": RERANKER_TOP_N,
+    "reranker_model": RERANKER_MODEL if USE_RERANKER else None,
+    "reranker_top_n": RERANKER_TOP_N if USE_RERANKER else None,
 
     "generation_llm": LLM_MODEL,
     "judge_llm": JUDGE_MODEL,
 }
 
+metadata = {
+    "experiment": EXPERIMENT_NAME,
+    "run_date": RUN_DATE,
+    "retrieval_mode": RETRIEVAL_MODE,
+    "chunk_size": CHUNK_SIZE,
+    "chunk_overlap": CHUNK_OVERLAP,
+    "top_k": TOP_K,
+    "fetch_k": FETCH_K,
+    "lambda_mult": LAMBDA_MULT,
+    "search_type": SEARCH_TYPE,
+    "use_reranker": USE_RERANKER,
+    "reranker_model": RERANKER_MODEL,
+    "reranker_top_n": RERANKER_TOP_N,
+    "embedding_model": EMBEDDING_MODEL,
+    "generation_llm": LLM_MODEL,
+    "judge_llm": JUDGE_MODEL,
+}
 
-df["experiment"] = EXPERIMENT_NAME
-df["run_date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-df["chunk_size"] = CHUNK_SIZE
-df["chunk_overlap"] = CHUNK_OVERLAP
-df["top_k"] = TOP_K
-df["fetch_k"] = FETCH_K
-df["lambda_mult"] = LAMBDA_MULT
-df["use_reranker"] = USE_RERANKER
-df["reranker_model"] = RERANKER_MODEL
-df["reranker_top_n"] = RERANKER_TOP_N
-df["embedding_model"] = EMBEDDING_MODEL
-df["search_type"] = SEARCH_TYPE
-df["generation_llm"] = LLM_MODEL
-df["judge_llm"] = JUDGE_MODEL
+for key, value in metadata.items():
+    df[key] = value
 
-print("\nAvailable columns:")
-print(df.columns.tolist())
+logger.info("\nAvailable columns:")
+logger.info(df.columns.tolist())
 
-print("\n--- Per Question Breakdown ---")
+logger.info("\n--- Per Question Breakdown ---")
 
 columns_to_show = [
     col for col in [
@@ -329,35 +367,99 @@ columns_to_show = [
     if col in df.columns
 ]
 
-print(df[columns_to_show].to_string(index=False))
-# -------------------------------------------------
-# 7. Save results
-# -------------------------------------------------
+logger.info(df[columns_to_show].to_string(index=False))
+# -------------------------------------------------Display
 
-output_dir = os.path.join("evaluate", "ragas_results")
-os.makedirs(output_dir, exist_ok=True)
-
-output_path = os.path.join(output_dir, f"{EXPERIMENT_NAME}_{datetime.now().strftime("%Y-%m-%d_%H_%M_%S")}.csv")
-
-json_path = output_path.replace(".csv", ".json")
-
-json_data = {
-    "experiment": experiment_info,
-    "results": evaluation_results,
+summary = {
+    "total_questions": len(TEST_DATA),
+    "successful_questions": len(evaluation_results),
+    "failed_questions": len(TEST_DATA) - len(evaluation_results),
 }
 
-with open(json_path, "w", encoding="utf-8") as f:
-    json.dump(
-        json_data,
-        f,
-        indent=4,
-        ensure_ascii=False,
-    )
+num_questions = max(len(evaluation_results), 1)
 
-print(f"✅ JSON saved to {json_path}")
+summary["avg_retrieval_latency"] = round(
+    sum(
+        r["latency"]["retrieval_seconds"]
+        for r in evaluation_results
+    ) / num_questions,
+    4
+)
 
-# -------------------------------------------------Display
-summary = {}
+summary["avg_reranker_latency"] = round(
+    sum(
+        r["latency"]["reranker_seconds"]
+        for r in evaluation_results
+    ) / num_questions,
+    4
+)
+
+summary["avg_generation_latency"] = round(
+    sum(
+        r["latency"]["generation_seconds"]
+        for r in evaluation_results
+    ) / num_questions,
+    4
+)
+
+summary["avg_pipeline_latency"] = round(
+    sum(
+        r["latency"]["pipeline_seconds"]
+        for r in evaluation_results
+    ) / num_questions,
+    4
+)
+
+summary["avg_prompt_latency"] = round(
+    sum(
+        r["latency"]["prompt_seconds"]
+        for r in evaluation_results
+    ) / num_questions,
+    4
+)
+
+summary["total_prompt_tokens"] = sum(
+    r["usage"].get("prompt_tokens", 0)
+    for r in evaluation_results
+)
+
+summary["total_completion_tokens"] = sum(
+    r["usage"].get("completion_tokens", 0)
+    for r in evaluation_results
+)
+
+summary["total_tokens"] = sum(
+    r["usage"].get("total_tokens", 0)
+    for r in evaluation_results
+)
+summary["avg_prompt_tokens"] = round(
+    summary["total_prompt_tokens"] / num_questions, 2
+)
+
+summary["avg_completion_tokens"] = round(
+    summary["total_completion_tokens"] / num_questions, 2
+)
+
+summary["avg_total_tokens"] = round(
+    summary["total_tokens"] / num_questions, 2
+)
+summary["avg_chunks_retrieved"] = round(
+    sum(
+        r["retrieval_stats"]["retrieved"]
+        for r in evaluation_results
+    ) / num_questions,
+    2
+)
+
+summary["avg_chunks_after_reranker"] = round(
+    sum(
+        r["retrieval_stats"]["after_reranker"]
+        for r in evaluation_results
+    ) / num_questions,
+    2
+)
+
+summary["ragas_evaluation_seconds"] = ragas_time
 
 for col in [
     "faithfulness",
@@ -369,7 +471,7 @@ for col in [
     if col in df.columns:
         summary[col] = round(df[col].mean(), 3)
 
-print(df[[
+logger.info(df[[
     "user_input",
     "response",
     "reference",
@@ -378,60 +480,27 @@ print(df[[
 ]])
 
 summary_row = {
-    # -----------------------------
-    # Experiment Information
-    # -----------------------------
-    "experiment": EXPERIMENT_NAME,
-    "run_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-
-    # -----------------------------
-    # Dataset
-    # -----------------------------
+    **metadata,
     "dataset": DATASET,
-
-    # -----------------------------
-    # Embedding
-    # -----------------------------
-    "embedding_model": EMBEDDING_MODEL,
-
-    # -----------------------------
-    # Chunking
-    # -----------------------------
-    "chunk_size": CHUNK_SIZE,
-    "chunk_overlap": CHUNK_OVERLAP,
-
-    # -----------------------------
-    # Retrieval
-    # -----------------------------
-    "search_type": SEARCH_TYPE,
-    "top_k": TOP_K,
-    "fetch_k": FETCH_K,
-    "lambda_mult": LAMBDA_MULT,
-
-    # -----------------------------
-    # Reranker
-    # -----------------------------
-    "use_reranker": USE_RERANKER,
-    "reranker_model": RERANKER_MODEL if USE_RERANKER else "None",
-    "reranker_top_n": RERANKER_TOP_N if USE_RERANKER else "None",
-
-    # -----------------------------
-    # LLM
-    # -----------------------------
-    "generation_llm": LLM_MODEL,
-    "judge_llm": JUDGE_MODEL,
     "temperature": TEMPERATURE,
 
-    # -----------------------------
-    # Average RAGAS Scores
-    # -----------------------------
-    "faithfulness": round(df["faithfulness"].mean(), 3),
-    "answer_relevancy": round(df["answer_relevancy"].mean(), 3),
-    "context_precision": round(df["context_precision"].mean(), 3),
-    "context_recall": round(df["context_recall"].mean(), 3),
+    "faithfulness": summary.get("faithfulness"),
+    "answer_relevancy": summary.get("answer_relevancy"),
+    "context_precision": summary.get("context_precision"),
+    "context_recall": summary.get("context_recall"),
+    "avg_pipeline_latency": summary.get("avg_pipeline_latency"),
+    "avg_generation_latency": summary.get("avg_generation_latency"),
+    "avg_retrieval_latency": summary.get("avg_retrieval_latency"), 
+    "avg_prompt_latency": summary.get("avg_prompt_latency"),
+    "avg_total_tokens": summary.get("avg_total_tokens"),
+    "ragas_evaluation_seconds": summary.get("ragas_evaluation_seconds"),
+    "avg_reranker_latency": summary.get("avg_reranker_latency"),
+    "avg_chunks_retrieved": summary.get("avg_chunks_retrieved"),
+    "avg_chunks_after_reranker": summary.get("avg_chunks_after_reranker"),
+    "avg_prompt_tokens": summary.get("avg_prompt_tokens"),
+    "avg_completion_tokens": summary.get("avg_completion_tokens"), 
 }
-
-EVALUATION_PATH = os.path.join("evaluate")
+ 
 summary_path = os.path.join(EVALUATION_PATH, "experiment_summary.csv")
 summary_df = pd.DataFrame([summary_row])
 
@@ -447,6 +516,38 @@ if os.path.exists(summary_path):
 summary_df.to_csv(summary_path, index=False)
 #---------------------------------------------
 
-print("\n========== AVERAGE SCORES ==========")
+logger.info("\n========== AVERAGE SCORES ==========")
 for metric, score in summary.items():
-    print(f"{metric}: {score}")
+    logger.info(f"{metric}: {score}")
+
+# -------------------------------------------------
+# 7. Save results
+# -------------------------------------------------
+
+output_dir = RAGAS_RESULTS_PATH
+os.makedirs(output_dir, exist_ok=True)
+
+output_path = os.path.join(output_dir, f"{EXPERIMENT_NAME}.json")
+
+json_data = {
+    "version": "1.0",
+    "experiment": experiment_info,
+    "summary": summary, 
+    "run_statistics": {
+        "total_questions": len(TEST_DATA),
+        "successful_questions": len(evaluation_results),
+        "failed_questions": len(TEST_DATA) - len(evaluation_results),
+    },
+
+    "results": evaluation_results
+}
+
+with open(output_path, "w", encoding="utf-8") as f:
+    json.dump(
+        json_data,
+        f,
+        indent=4,
+        ensure_ascii=False,
+    )
+
+logger.info(f"✅ JSON saved to {output_path}")
