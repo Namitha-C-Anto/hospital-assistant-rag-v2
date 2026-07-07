@@ -18,7 +18,7 @@ DOCS_PATH = os.path.join(BASE_DIR, "docs", DATASET)
 DB_PATH = os.path.join(BASE_DIR, "db", "faiss_index")
 CHUNKS_PATH = os.path.join(BASE_DIR, "db", "chunks")
 
-EVALUATION_PATH = os.path.join(BASE_DIR, "evaluate")
+EVALUATION_PATH = os.path.join(BASE_DIR, "evaluate", "evaluation_results")
 RAGAS_RESULTS_PATH = os.path.join(EVALUATION_PATH, "ragas_results", DATASET)
 COMPARISON_PATH = os.path.join(EVALUATION_PATH, "comparisons")
 REPORT_PATH = os.path.join(EVALUATION_PATH, "reports")

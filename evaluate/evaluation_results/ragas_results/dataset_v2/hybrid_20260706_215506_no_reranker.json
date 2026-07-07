@@ -1,0 +1,173 @@
+{
+    "version": "1.0",
+    "experiment": {
+        "experiment": "hybrid_20260706_215506_no_reranker",
+        "run_date": "20260706_215506",
+        "dataset": "dataset_v2",
+        "temperature": 1.0,
+        "retrieval_mode": "hybrid",
+        "search_type": "mmr",
+        "embedding_model": "sentence-transformers/all-mpnet-base-v2",
+        "chunk_size": 700,
+        "chunk_overlap": 150,
+        "top_k": 15,
+        "fetch_k": 30,
+        "lambda_mult": 0.4,
+        "use_reranker": false,
+        "reranker_model": null,
+        "reranker_top_n": null,
+        "generation_llm": "gpt-4o-mini",
+        "judge_llm": "gpt-5.4-mini"
+    },
+    "summary": {
+        "total_questions": 1,
+        "successful_questions": 1,
+        "failed_questions": 0,
+        "avg_retrieval_latency": 0.6732,
+        "avg_reranker_latency": 0.0,
+        "avg_generation_latency": 2.5037,
+        "avg_pipeline_latency": 3.1772,
+        "avg_prompt_latency": 0.0002,
+        "total_prompt_tokens": 1689,
+        "total_completion_tokens": 87,
+        "total_tokens": 1776,
+        "avg_prompt_tokens": 1689.0,
+        "avg_completion_tokens": 87.0,
+        "avg_total_tokens": 1776.0,
+        "avg_chunks_retrieved": 15.0,
+        "avg_chunks_after_reranker": 15.0,
+        "ragas_evaluation_seconds": 53.9455,
+        "faithfulness": 0.875,
+        "answer_relevancy": 0.968,
+        "context_precision": 0.833,
+        "context_recall": 1.0
+    },
+    "run_statistics": {
+        "total_questions": 1,
+        "successful_questions": 1,
+        "failed_questions": 0
+    },
+    "results": [
+        {
+            "question": "According to the guidelines, what are the responsibilities of the Hospital Bed Manager (HBM)?",
+            "latency": {
+                "retrieval_seconds": 0.6732,
+                "reranker_seconds": 0,
+                "generation_seconds": 2.5037,
+                "pipeline_seconds": 3.1772,
+                "prompt_seconds": 0.0002
+            },
+            "retrieval_stats": {
+                "retrieved": 15,
+                "after_reranker": 15
+            },
+            "retrieval": {
+                "retrieved_documents": [
+                    {
+                        "rank": 1,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 19,
+                        "content": "of management. Part of their role would include continuous analysis and the provision of reports and forecasts. The function of allocating beds to patients should be centralised and the Hospital Bed Manager should have authority over the access to all hospital beds. There should be an awareness of the bed designation ration as set out by the Department of Health and Children. The Hospital Bed Manager should work within the notional allocation of beds to each speciality to ensure that patients are accommodated in the most appropriate bed available at the time of their admission, and to ensure that patients are cared for by staff with the appropriate expertise. What are the key processes for"
+                    },
+                    {
+                        "rank": 2,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 17,
+                        "content": "Best Practice, Protocols and Policies for Improving Emergency, and Elective Admissions and Discharges Introduction Bed management within the hospital setting is often the driver for the development of policy in relation to patient admission and discharges. Best practice should underpin the development of bed management policies to enhance the effective management of emergency and elective admissions and discharges. The events of admission and discharge are pivotal in an integrated approach to bed management, together with the central position of the patient in the decision making process. 13 This requires an integrated multidisciplinary team approach to care delivery, necessitating the"
+                    },
+                    {
+                        "rank": 3,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 19,
+                        "content": "A patient’s episode of care should be planned before his/her admission and should take account of the entire “journey” up to and after discharge from hospital. Patient’s and their carers should be partners in this planning. Bed management should be overseen by a Hospital Bed Manager (HBM) who has the authority to implement the bed management policy and to co-ordinate the bed management team. The bed management service should operate on a permanent basis, i.e. for 24 hours on every day of the year. The bed manager reports to a senior member of management. Part of their role would include continuous analysis and the provision of reports and forecasts. The function of allocating beds to"
+                    },
+                    {
+                        "rank": 4,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 23,
+                        "content": "Australia (1999) Managing beds better, Balancing supply and demand. The NDDHP –2 experience. 13. Capita Consulting (2003) National Review of Bed Management Function : Final Report to the Employers and Unions. 14. Department of Health and Children (2003). Report of the National Task Force on Medical Staffing. (Hanly Report). Admissions and Discharge Guidelines - 22"
+                    },
+                    {
+                        "rank": 5,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 22,
+                        "content": "Conclusion Management of inpatient admissions and discharges is essential to enhance the quality of patient care across all sectors of healthcare. Team working and partnership at all levels of health care service delivery must be encouraged to ensure that health care is planned, managed and delivered based on a patient centred approach which ensures quality and fairness for all. It may be necessary to extend the roles and responsibilities of bed managers, improving co- ordination between different professional groups quality of patient care.3 A “whole systems approach” is essential to admission planning and is underpinned by high quality communication and information systems. This ensures"
+                    },
+                    {
+                        "rank": 6,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 7,
+                        "content": "emergency admissions and discharges. Grounded in the principle of “people-centredness” which, increasingly, influences the planning and delivery of services, the guidelines aim to support health care professionals in the development of local policies and protocols. The purpose of the guidelines is to direct the provision of an effective and efficient level of appropriate patient centred care, through the development of appropriate links between Primary (e.g. General Practitioner, Practice Nurse), Secondary (e.g. Acute Hospital), Community and Continuing Care Services (e.g Cottage Hospital and Hospice). A system wide approach will require the enhancement of relationships between hospitals"
+                    },
+                    {
+                        "rank": 7,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 8,
+                        "content": "Health Information and Quality Authority may oversee the adoption of standardised practices, procedures, and protocols in each care setting in line with international best practice. Admissions and Discharge Guidelines - 7"
+                    },
+                    {
+                        "rank": 8,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 9,
+                        "content": "Strategic objectives The key strategic objectives underpinning an effective and coherent admissions and discharge policy for emergency and elective patients are: • The provision of an integrated personal health and social services system resulting in seamless patient centred care at all times. • The utilisation of resources to maximise clinical and organisational effectiveness and outcomes. • The establishment of fully integrated networks of acute care which are accessible to each person. • The provision of levels of local access to acute care whilst at the same time ensuring high quality clinical care. • The acquisition of clinical admissions data to assist service planning and monitoring."
+                    },
+                    {
+                        "rank": 9,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 10,
+                        "content": "bed capacity). • The resulting congestion within Emergency Departments (EDs)2. • Inappropriate retention of patients in hospital beds. Admissions and Discharge Guidelines - 9"
+                    },
+                    {
+                        "rank": 10,
+                        "source": "hospital_collection.pdf",
+                        "page": 1,
+                        "content": "clear and consistent guidelines for conducting billing and collections functions in a manner that promotes compliance, patient satisfaction, and efficiency. Through the use of billing statements, written correspondence, and phone calls, Major Hospital will make diligent efforts to inform patients of their financial responsibilities and available financial assistance options, as well as follow up with patients regarding outstanding accounts. Additionally, this Policy requires Major Hospital to make reasonable efforts to determine a patient’s eligibility for financial assistance before engaging in Extraordinary Collection Actions to obtain payment. This Policy applies to all sums due from"
+                    },
+                    {
+                        "rank": 11,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 20,
+                        "content": "should be documented and communicated to the patient and relevant personnel within 24 hours of admission. • Discharge should be “streamlined” (e.g. prescriptions and letter should be completed in a timely manner, transport booked and test results made available promptly). • Complex discharges should be discussed at a regular multidisciplinary forum to ensure discharge is expedited. What are the processes required for effective discharge planning? • There should be an organisation led commitment to manage all hospital beds. • Resources such as a discharge co-ordinator to ensure delays are minimised and extensive patient and family involvement in decision making processes. • Referrals to"
+                    },
+                    {
+                        "rank": 12,
+                        "source": "hospital_collection.pdf",
+                        "page": 2,
+                        "content": "3. Uninsured Patient Billing • Major Hospital sends an informational letter to Patients without insurance coverage approximately three days following the date of discharge. This mailing includes the Plain Language Summary of the FAP. • Balances for uninsured patients are reduced by the AGB limitations described in the FAP prior to the informational letter being generated. This discount amount was calculated pursuant to the FAP utilizing the look back method described in the 501 (r) requirements. • If the account guarantor does not make payment arrangements or apply for financial assistance within fourteen (14) days of the informational letter date, Major Hospital sends the first patient"
+                    },
+                    {
+                        "rank": 13,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 14,
+                        "content": "Primary Care Strategy model of Primary Care Teams and Networks. There is a need to strengthen the community and continuing care settings to provide rehabilitation, respite and ongoing care, reflective of special population needs.11 The process of hospital admission A range of service processes have been identified as effective in managing the flow of patients through acute hospital services which will be outlined later. In addition, regular communication, good relations and ad hoc liaison, between all those involved are essential to effective bed management. Opportunities to provide an integrated service delivery system arise at two important service points, before hospital admission and"
+                    },
+                    {
+                        "rank": 14,
+                        "source": "hospital_collection.pdf",
+                        "page": 1,
+                        "content": "• If a claim is denied or is not processed by a payer, staff will follow up with the payer and patient as appropriate to facilitate resolution of the claim. If resolution does not occur after prudent follow-up efforts, Major Hospital may bill the patient subject to the provisions below regarding ECAs. 2. Insured Patient Billing • Major Hospital generates the first patient statement in a timely manner following receipt of the insurance payment or denial. • Major Hospital mails at least (3) three separate statements until the balance is resolved subject to the provisions below regarding ECAs. Follow-up phone calls are also made to the account guarantor."
+                    },
+                    {
+                        "rank": 15,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 22,
+                        "content": "A “whole systems approach” is essential to admission planning and is underpinned by high quality communication and information systems. This ensures that the patient’s journey is streamlined and underpinned by best practice. These guidelines endeavour to reflect best international practice in relation to hospital admission and discharge planning. It is hoped that they will assist in the planning of hospital patient care throughout the country and will help to provide a framework for management and measurement of a constantly improving service to our patients. Therefore it is strongly recommended that services should be delivered in adherence to these guidelines. It is now planned that they"
+                    }
+                ]
+            },
+            "usage": {
+                "prompt_tokens": 1689,
+                "completion_tokens": 87,
+                "total_tokens": 1776
+            },
+            "answer": "The responsibilities of the Hospital Bed Manager (HBM) include overseeing bed management, implementing the bed management policy, coordinating the bed management team, and allocating beds to patients. The HBM should also conduct continuous analysis and provide reports and forecasts. Additionally, the HBM is responsible for ensuring that patients are accommodated in the most appropriate bed available at the time of their admission and ensuring that patients are cared for by staff with the appropriate expertise.",
+            "reference": "The Hospital Bed Manager should oversee bed management, implement the bed management policy, coordinate the bed management team, operate the service continuously (24/7), report to senior management, continuously analyse bed usage and provide reports and forecasts, centralise bed allocation, and ensure patients are accommodated in the most appropriate beds.",
+            "metrics": {
+                "faithfulness": 0.875,
+                "answer_relevancy": 0.9679213402076398,
+                "context_precision": 0.8333333332916666,
+                "context_recall": 1.0
+            }
+        }
+    ]
+}
