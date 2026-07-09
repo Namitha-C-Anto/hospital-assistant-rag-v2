@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 
 # --------------------------------------------------
 # Load Environment Variables
@@ -118,3 +119,5 @@ if not OPENAI_API_KEY:
 
 if not GROQ_API_KEY:
     print("Warning: GROQ_API_KEY not found.")
+
+RUN_DATE = datetime.now().strftime("%Y%m%d_%H%M%S")

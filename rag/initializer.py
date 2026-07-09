@@ -5,6 +5,7 @@ from config import JUDGE_MODEL, OPENAI_API_KEY, EMBEDDING_MODEL, LLM_MODEL
 from ragas.embeddings import LangchainEmbeddingsWrapper
 from langchain_huggingface import HuggingFaceEmbeddings
 from ragas.llms import LangchainLLMWrapper 
+from rag.models import PipelineComponents
 
 def initialize_pipeline():
     
@@ -37,14 +38,14 @@ def initialize_pipeline():
         model= LLM_MODEL,
         api_key= OPENAI_API_KEY,
         )
-
-    return {
-        "vectorstore": vectorstore,
-        "retriever": retriever,
-        "app_llm": app_llm,
-        "judge_llm": judge_llm,
-        "ragas_llm": ragas_llm,
-        "ragas_embeddings": ragas_embeddings,
-        "faiss_retriever": faiss_retriever,
-        "bm25_retriever": bm25_retriever
-    }
+    return PipelineComponents(
+        vectorstore=vectorstore,
+        retriever=retriever,
+        faiss_retriever=faiss_retriever,
+        bm25_retriever=bm25_retriever,
+        app_llm=app_llm,
+        judge_llm=judge_llm,
+        ragas_llm=ragas_llm,
+        ragas_embeddings=ragas_embeddings,
+    )
+    

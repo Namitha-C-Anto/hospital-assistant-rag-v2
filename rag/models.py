@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Dict, Any, List
+from langchain_openai import ChatOpenAI
 
 @dataclass
 class DocumentInfo:
@@ -57,3 +58,19 @@ class PipelineRequest:
     question: str
     chat_history: str = "",
     metrics: Metrics = field(default_factory=Metrics)
+
+@dataclass
+class PipelineComponents:
+    vectorstore: object
+    retriever: dict
+    faiss_retriever: object
+    bm25_retriever: object
+    app_llm: ChatOpenAI
+    judge_llm: ChatOpenAI
+    ragas_llm: object
+    ragas_embeddings: object
+
+@dataclass
+class RetrievalResult:
+    retrieved_documents: list[DocumentInfo]
+    reranked_documents: list[DocumentInfo]
