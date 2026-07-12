@@ -83,6 +83,10 @@ def run_ragas_evaluation(evaluation_results, components):
     logger.info("========== RAGAS SCORES ==========")
     logger.info(results)
 
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print(results)
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    
     return results, ragas_time
 
 #----------------------------------------------------------------------

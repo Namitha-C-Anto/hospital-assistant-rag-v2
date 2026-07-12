@@ -1,0 +1,600 @@
+{
+    "version": "1.0",
+    "experiment": {
+        "experiment": "faiss_20260712_115453_no_reranker",
+        "run_date": "20260712_115453",
+        "dataset": "dataset_v2",
+        "temperature": 1.0,
+        "retrieval_mode": "faiss",
+        "search_type": "mmr",
+        "embedding_model": "sentence-transformers/all-mpnet-base-v2",
+        "chunk_size": 700,
+        "chunk_overlap": 150,
+        "top_k": 15,
+        "fetch_k": 30,
+        "lambda_mult": 0.4,
+        "use_reranker": false,
+        "reranker_model": null,
+        "reranker_top_n": null,
+        "generation_llm": "gpt-4o-mini",
+        "judge_llm": "gpt-5.4-mini"
+    },
+    "summary": {
+        "total_questions": 2,
+        "successful_questions": 2,
+        "failed_questions": 0,
+        "avg_retrieval_latency": 1.846,
+        "avg_reranker_latency": 0.0,
+        "avg_generation_latency": 2.6261,
+        "avg_pipeline_latency": 4.4809,
+        "avg_prompt_latency": 0.0083,
+        "avg_chunks_retrieved": 15.0,
+        "avg_chunks_after_reranker": 15.0,
+        "total_prompt_tokens": 3070,
+        "total_completion_tokens": 145,
+        "total_tokens": 3215,
+        "avg_prompt_tokens": 1535.0,
+        "avg_completion_tokens": 72.5,
+        "avg_total_tokens": 1607.5,
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.924,
+        "context_precision": 0.363,
+        "context_recall": 1.0,
+        "ragas_evaluation_seconds": 35.6362
+    },
+    "run_statistics": {
+        "total_questions": 2,
+        "successful_questions": 2,
+        "failed_questions": 0
+    },
+    "results": [
+        {
+            "question": "What are the two types of hospital admissions described in the guidelines?",
+            "answer": "The two types of hospital admissions described in the guidelines are elective admissions and emergency admissions. Elective admissions are planned, while emergency admissions are not planned and result from trauma or acute illness.",
+            "reference": "The guidelines describe two types of hospital admissions: elective admissions, which are planned, and emergency admissions, which are unplanned and require urgent care.",
+            "ground_truth": "The guidelines describe two types of hospital admissions: elective admissions, which are planned, and emergency admissions, which are unplanned and require urgent care.",
+            "latency": {
+                "retrieval_seconds": 3.423,
+                "reranker_seconds": 0,
+                "prompt_seconds": 0.016,
+                "generation_seconds": 3.6706,
+                "pipeline_seconds": 7.1101
+            },
+            "usage": {
+                "prompt_tokens": 1654,
+                "completion_tokens": 37,
+                "total_tokens": 1691
+            },
+            "retrieval": {
+                "retrieved_documents": [
+                    {
+                        "content": "admission to more rigorous assessment to ensure the appropriateness of hospital admission and to maximise the number of beds available for elective admissions. The philosophy of care must shift emphasis from admission to assessment to ensure appropriateness of admission and maximise bed availability for elective admissions. Admissions and Discharge Guidelines - 16",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 17,
+                            "doc_id": "6dadb8c02fcf1d7809b42f49c22c22e1"
+                        }
+                    },
+                    {
+                        "content": "arrangements or apply for financial assistance within fourteen (14) days of the informational letter date, Major Hospital sends the first patient statement. • Major Hospital mails at least three (3) separate statements and a final notice letter until the balance is resolved subject to the provisions below regarding ECAs. Follow-up phone calls will also be made to the account guarantor. 4. Miscellaneous Patient Billing • The first patient statement includes the following pieces of information: ₀₀ A summary of the hospital services covered by the statement. ₀₀ The charges for each service. ₀₀ Information on the Prompt Pay Discount. • Each patient statement and letter includes information on",
+                        "metadata": {
+                            "source": "hospital_collection.pdf",
+                            "page": 2,
+                            "doc_id": "776670c6645e146d0eede9a1ef330ba5"
+                        }
+                    },
+                    {
+                        "content": "Admissions and Discharge Guidelines - 2",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 3,
+                            "doc_id": "40530a626d8c854b3c1c830314b69760"
+                        }
+                    },
+                    {
+                        "content": "delays in the Emergency Department if admission is definite. These pathways should be developed in consultation with the relevant professionals and stakeholders. • Rapid access facilities such as Medical Assessment Units (MAU) requiring robust, specific and auditable operational policies. • Protocols for transfer of patients within and between regional areas and tertiary units to continue to be developed and implemented with pre-hospital emergency care, trauma teams and other relevant parties. • Nurse led services i.e Advanced Nurse Practitioners (ANPs).2,14 • Short Stay observation wards or Clinical Decision Units (CDUs) are advocated in emergency patient care. Such units should be",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 18,
+                            "doc_id": "1de7527b1c1d690c8923db1a5ad20aa0"
+                        }
+                    },
+                    {
+                        "content": "A “whole systems approach” is essential to admission planning and is underpinned by high quality communication and information systems. This ensures that the patient’s journey is streamlined and underpinned by best practice. These guidelines endeavour to reflect best international practice in relation to hospital admission and discharge planning. It is hoped that they will assist in the planning of hospital patient care throughout the country and will help to provide a framework for management and measurement of a constantly improving service to our patients. Therefore it is strongly recommended that services should be delivered in adherence to these guidelines. It is now planned that they",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 22,
+                            "doc_id": "ec073a432267908871b1c621a04779e0"
+                        }
+                    },
+                    {
+                        "content": "Before the patient is admitted to hospital • There should be a clearly defined pre-admission process, which applies to both emergency and elective admissions. • The decision to access a hospital service should be shared between the patient and a member of the primary care team (PCT) where possible. • Pre-admission services are integrated into secondary care service delivery. • Pre-admission assessment is conducted on an outpatient basis wherever possible; some aspects of pre-admission assessment may be undertaken by the Primary Care Team if appropriate. • Pre-admission assessment aims to optimise a patient’s health status before planned admission to hospital. • At the pre-admission visit,",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 15,
+                            "doc_id": "10baad2bedab2da8beb3e05f6e6365ba"
+                        }
+                    },
+                    {
+                        "content": "Executive Summary Introduction Admission to an acute hospital may be planned (elective) or may be required as a matter of urgency (emergency). Elective admissions are those which occur as a consequence of referral to hospital by a general practitioner, medical consultant, a visit to the hospital outpatient department or a planned transfer from another hospital. Some patients may confound these definitions e.g. patients requiring chemotherapy who may be both urgent and planned. These guidelines have been developed in response to the National Health Strategy, Quality and Fairness (DOHC 2001) which states, among other things, that “The discharge planning function in each acute hospital will be",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 7,
+                            "doc_id": "3bb19654c4d3a964ead2382ab04857de"
+                        }
+                    },
+                    {
+                        "content": "Strategic objectives The key strategic objectives underpinning an effective and coherent admissions and discharge policy for emergency and elective patients are: • The provision of an integrated personal health and social services system resulting in seamless patient centred care at all times. • The utilisation of resources to maximise clinical and organisational effectiveness and outcomes. • The establishment of fully integrated networks of acute care which are accessible to each person. • The provision of levels of local access to acute care whilst at the same time ensuring high quality clinical care. • The acquisition of clinical admissions data to assist service planning and monitoring.",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 9,
+                            "doc_id": "fc48674b3c7a49e9967f76ad7a401053"
+                        }
+                    },
+                    {
+                        "content": "one that is not planned and which results from trauma (injury) or acute illness which cannot be treated on an outpatient basis.5 In order to manage the balance between elective and emergency admissions, the factors below have been identified as effective in improving the management of admissions and general patient flow in the Emergency Department (ED): • Where there is a mix of elective and emergency admission in hospitals, occupancy levels should allow for flexibility in dealing with the natural ebb and flow of illness and injury in the community. Thus, a level of about 85% hospital bed occupancy is desirable. • Having a senior medical presence in the emergency department at all times.",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 11,
+                            "doc_id": "67cc981501baed3e6723918f0d254cab"
+                        }
+                    },
+                    {
+                        "content": "at the time of their admission, and to ensure that patients are cared for by staff with the appropriate expertise. What are the key processes for effective elective admissions? The following key requirements have been identified to facilitate effective elective admission practices: • Centralised waiting list management and agreement on the parameters for scheduling theatre lists with clinicians. • Pre-admission assessment should be a standard requirement for all elective admissions to ensure appropriate planning of the entire patient journey. Admissions and Discharge Guidelines - 18",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 19,
+                            "doc_id": "09dcc7cc3ef3895c8db574ee96928dd2"
+                        }
+                    },
+                    {
+                        "content": "• The anticipated length of stay (this should be indicated as early as possible to facilitate scheduling) for elective admissions should be indicated as early as possible to facilitate scheduling. • Increased day surgery can also be supported by before admission assessment to ensure appropriate scheduling and to minimise transfer to inpatient beds. • Discharge lounges may be used to facilitate early discharge as well as accommodation for “day of surgery” arrivals and timely commencement of theatre lists. Discharges Discharge planning should commence pre-admission. On admission, the patient’s pre-morbid and functional status information are documented in order to inform discharge planning and",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 20,
+                            "doc_id": "39c6fd229bd0d7e88816d0d7f19cddc9"
+                        }
+                    },
+                    {
+                        "content": "resources must be efficiently and effectively utilised. Services are organised so that patients, depending on their needs, can move smoothly between emergency care and the best and most appropriate inpatient care, primary care and continuing care.2 Effective quality assurance and safe care are essential rights of all users of the health services. Achieving the standards set by the Irish Health Services Accreditation Board will ensure that all hospitals are providing such care. Emergency admissions An emergency hospital admission is defined as one that is not planned and which results from trauma (injury) or acute illness which cannot be treated on an outpatient basis.5 In order to manage",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 11,
+                            "doc_id": "67cc981501baed3e6723918f0d254cab"
+                        }
+                    },
+                    {
+                        "content": "planning may be co-ordinated by a named person who has responsibility for co-ordinating all stages of the “patient journey”. • Effective use is made of transitional and intermediate care services, so that existing acute hospital capacity is used appropriately and individuals achieve their optimal health outcome.1 • Specialised expertise and/or support services for special needs cases e.g. the homeless and ethnic minorities. Admissions and Discharge Guidelines - 12",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 13,
+                            "doc_id": "d5006acdd4032f711de37fde5985d875"
+                        }
+                    },
+                    {
+                        "content": "to our patients. Therefore it is strongly recommended that services should be delivered in adherence to these guidelines. It is now planned that they will be used as a measurement tool to evaluate the effectiveness of admissions and discharges nationally and the outcomes achieved relative to the aims set out in the document. Admissions and Discharge Guidelines - 21",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 22,
+                            "doc_id": "ec073a432267908871b1c621a04779e0"
+                        }
+                    },
+                    {
+                        "content": "• Decision support systems enhance consistency of decision making such as nurse led telephone triage can be used to enhance consistency of medical and nursing decision making. (e.g. NHS direct telephone advice service). • There should be regular and influential audit of clinical activity. • The critical role of Health Care Staff should be acknowledged with appropriate support for professional development and influence in decision making at all levels. Elective admissions What are the key principles in planning elective hospital admissions ? A patient’s episode of care should be planned before his/her admission and should take account of the entire “journey” up to and after discharge from",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 19,
+                            "doc_id": "09dcc7cc3ef3895c8db574ee96928dd2"
+                        }
+                    }
+                ],
+                "reranked_documents": [
+                    {
+                        "content": "admission to more rigorous assessment to ensure the appropriateness of hospital admission and to maximise the number of beds available for elective admissions. The philosophy of care must shift emphasis from admission to assessment to ensure appropriateness of admission and maximise bed availability for elective admissions. Admissions and Discharge Guidelines - 16",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 17,
+                            "doc_id": "6dadb8c02fcf1d7809b42f49c22c22e1"
+                        }
+                    },
+                    {
+                        "content": "arrangements or apply for financial assistance within fourteen (14) days of the informational letter date, Major Hospital sends the first patient statement. • Major Hospital mails at least three (3) separate statements and a final notice letter until the balance is resolved subject to the provisions below regarding ECAs. Follow-up phone calls will also be made to the account guarantor. 4. Miscellaneous Patient Billing • The first patient statement includes the following pieces of information: ₀₀ A summary of the hospital services covered by the statement. ₀₀ The charges for each service. ₀₀ Information on the Prompt Pay Discount. • Each patient statement and letter includes information on",
+                        "metadata": {
+                            "source": "hospital_collection.pdf",
+                            "page": 2,
+                            "doc_id": "776670c6645e146d0eede9a1ef330ba5"
+                        }
+                    },
+                    {
+                        "content": "Admissions and Discharge Guidelines - 2",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 3,
+                            "doc_id": "40530a626d8c854b3c1c830314b69760"
+                        }
+                    },
+                    {
+                        "content": "delays in the Emergency Department if admission is definite. These pathways should be developed in consultation with the relevant professionals and stakeholders. • Rapid access facilities such as Medical Assessment Units (MAU) requiring robust, specific and auditable operational policies. • Protocols for transfer of patients within and between regional areas and tertiary units to continue to be developed and implemented with pre-hospital emergency care, trauma teams and other relevant parties. • Nurse led services i.e Advanced Nurse Practitioners (ANPs).2,14 • Short Stay observation wards or Clinical Decision Units (CDUs) are advocated in emergency patient care. Such units should be",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 18,
+                            "doc_id": "1de7527b1c1d690c8923db1a5ad20aa0"
+                        }
+                    },
+                    {
+                        "content": "A “whole systems approach” is essential to admission planning and is underpinned by high quality communication and information systems. This ensures that the patient’s journey is streamlined and underpinned by best practice. These guidelines endeavour to reflect best international practice in relation to hospital admission and discharge planning. It is hoped that they will assist in the planning of hospital patient care throughout the country and will help to provide a framework for management and measurement of a constantly improving service to our patients. Therefore it is strongly recommended that services should be delivered in adherence to these guidelines. It is now planned that they",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 22,
+                            "doc_id": "ec073a432267908871b1c621a04779e0"
+                        }
+                    },
+                    {
+                        "content": "Before the patient is admitted to hospital • There should be a clearly defined pre-admission process, which applies to both emergency and elective admissions. • The decision to access a hospital service should be shared between the patient and a member of the primary care team (PCT) where possible. • Pre-admission services are integrated into secondary care service delivery. • Pre-admission assessment is conducted on an outpatient basis wherever possible; some aspects of pre-admission assessment may be undertaken by the Primary Care Team if appropriate. • Pre-admission assessment aims to optimise a patient’s health status before planned admission to hospital. • At the pre-admission visit,",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 15,
+                            "doc_id": "10baad2bedab2da8beb3e05f6e6365ba"
+                        }
+                    },
+                    {
+                        "content": "Executive Summary Introduction Admission to an acute hospital may be planned (elective) or may be required as a matter of urgency (emergency). Elective admissions are those which occur as a consequence of referral to hospital by a general practitioner, medical consultant, a visit to the hospital outpatient department or a planned transfer from another hospital. Some patients may confound these definitions e.g. patients requiring chemotherapy who may be both urgent and planned. These guidelines have been developed in response to the National Health Strategy, Quality and Fairness (DOHC 2001) which states, among other things, that “The discharge planning function in each acute hospital will be",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 7,
+                            "doc_id": "3bb19654c4d3a964ead2382ab04857de"
+                        }
+                    },
+                    {
+                        "content": "Strategic objectives The key strategic objectives underpinning an effective and coherent admissions and discharge policy for emergency and elective patients are: • The provision of an integrated personal health and social services system resulting in seamless patient centred care at all times. • The utilisation of resources to maximise clinical and organisational effectiveness and outcomes. • The establishment of fully integrated networks of acute care which are accessible to each person. • The provision of levels of local access to acute care whilst at the same time ensuring high quality clinical care. • The acquisition of clinical admissions data to assist service planning and monitoring.",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 9,
+                            "doc_id": "fc48674b3c7a49e9967f76ad7a401053"
+                        }
+                    },
+                    {
+                        "content": "one that is not planned and which results from trauma (injury) or acute illness which cannot be treated on an outpatient basis.5 In order to manage the balance between elective and emergency admissions, the factors below have been identified as effective in improving the management of admissions and general patient flow in the Emergency Department (ED): • Where there is a mix of elective and emergency admission in hospitals, occupancy levels should allow for flexibility in dealing with the natural ebb and flow of illness and injury in the community. Thus, a level of about 85% hospital bed occupancy is desirable. • Having a senior medical presence in the emergency department at all times.",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 11,
+                            "doc_id": "67cc981501baed3e6723918f0d254cab"
+                        }
+                    },
+                    {
+                        "content": "at the time of their admission, and to ensure that patients are cared for by staff with the appropriate expertise. What are the key processes for effective elective admissions? The following key requirements have been identified to facilitate effective elective admission practices: • Centralised waiting list management and agreement on the parameters for scheduling theatre lists with clinicians. • Pre-admission assessment should be a standard requirement for all elective admissions to ensure appropriate planning of the entire patient journey. Admissions and Discharge Guidelines - 18",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 19,
+                            "doc_id": "09dcc7cc3ef3895c8db574ee96928dd2"
+                        }
+                    },
+                    {
+                        "content": "• The anticipated length of stay (this should be indicated as early as possible to facilitate scheduling) for elective admissions should be indicated as early as possible to facilitate scheduling. • Increased day surgery can also be supported by before admission assessment to ensure appropriate scheduling and to minimise transfer to inpatient beds. • Discharge lounges may be used to facilitate early discharge as well as accommodation for “day of surgery” arrivals and timely commencement of theatre lists. Discharges Discharge planning should commence pre-admission. On admission, the patient’s pre-morbid and functional status information are documented in order to inform discharge planning and",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 20,
+                            "doc_id": "39c6fd229bd0d7e88816d0d7f19cddc9"
+                        }
+                    },
+                    {
+                        "content": "resources must be efficiently and effectively utilised. Services are organised so that patients, depending on their needs, can move smoothly between emergency care and the best and most appropriate inpatient care, primary care and continuing care.2 Effective quality assurance and safe care are essential rights of all users of the health services. Achieving the standards set by the Irish Health Services Accreditation Board will ensure that all hospitals are providing such care. Emergency admissions An emergency hospital admission is defined as one that is not planned and which results from trauma (injury) or acute illness which cannot be treated on an outpatient basis.5 In order to manage",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 11,
+                            "doc_id": "67cc981501baed3e6723918f0d254cab"
+                        }
+                    },
+                    {
+                        "content": "planning may be co-ordinated by a named person who has responsibility for co-ordinating all stages of the “patient journey”. • Effective use is made of transitional and intermediate care services, so that existing acute hospital capacity is used appropriately and individuals achieve their optimal health outcome.1 • Specialised expertise and/or support services for special needs cases e.g. the homeless and ethnic minorities. Admissions and Discharge Guidelines - 12",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 13,
+                            "doc_id": "d5006acdd4032f711de37fde5985d875"
+                        }
+                    },
+                    {
+                        "content": "to our patients. Therefore it is strongly recommended that services should be delivered in adherence to these guidelines. It is now planned that they will be used as a measurement tool to evaluate the effectiveness of admissions and discharges nationally and the outcomes achieved relative to the aims set out in the document. Admissions and Discharge Guidelines - 21",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 22,
+                            "doc_id": "ec073a432267908871b1c621a04779e0"
+                        }
+                    },
+                    {
+                        "content": "• Decision support systems enhance consistency of decision making such as nurse led telephone triage can be used to enhance consistency of medical and nursing decision making. (e.g. NHS direct telephone advice service). • There should be regular and influential audit of clinical activity. • The critical role of Health Care Staff should be acknowledged with appropriate support for professional development and influence in decision making at all levels. Elective admissions What are the key principles in planning elective hospital admissions ? A patient’s episode of care should be planned before his/her admission and should take account of the entire “journey” up to and after discharge from",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 19,
+                            "doc_id": "09dcc7cc3ef3895c8db574ee96928dd2"
+                        }
+                    }
+                ]
+            },
+            "retrieval_stats": {
+                "retrieved": 15,
+                "after_reranker": 15
+            },
+            "metrics": {
+                "faithfulness": 1.0,
+                "answer_relevancy": 1.0000000000000002,
+                "context_precision": 0.502276735604488,
+                "context_recall": 1.0
+            }
+        },
+        {
+            "question": "What are the five strategic objectives of an effective admissions and discharge policy?",
+            "answer": "The five strategic objectives of an effective admissions and discharge policy for emergency and elective patients are:\n\n1. The provision of an integrated personal health and social services system resulting in seamless patient centred care at all times.\n2. The utilisation of resources to maximise clinical and organisational effectiveness and outcomes.\n3. The establishment of fully integrated networks of acute care which are accessible to each person.\n4. The provision of levels of local access to acute care whilst ensuring high quality clinical care.\n5. The acquisition of clinical admissions data to assist service planning and monitoring.",
+            "reference": "The objectives are to provide integrated patient-centred care, maximize clinical and organizational effectiveness, establish integrated acute care networks, ensure local access with high-quality care, and acquire admissions data for planning and monitoring.",
+            "ground_truth": "The objectives are to provide integrated patient-centred care, maximize clinical and organizational effectiveness, establish integrated acute care networks, ensure local access with high-quality care, and acquire admissions data for planning and monitoring.",
+            "latency": {
+                "retrieval_seconds": 0.2691,
+                "reranker_seconds": 0,
+                "prompt_seconds": 0.0005,
+                "generation_seconds": 1.5816,
+                "pipeline_seconds": 1.8517
+            },
+            "usage": {
+                "prompt_tokens": 1416,
+                "completion_tokens": 108,
+                "total_tokens": 1524
+            },
+            "retrieval": {
+                "retrieved_documents": [
+                    {
+                        "content": "Admissions and Discharge Guidelines Health Strategy Implementation Project 2003",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 1,
+                            "doc_id": "0aec2b583d145d3667a655a3aeac2a63"
+                        }
+                    },
+                    {
+                        "content": "admission to more rigorous assessment to ensure the appropriateness of hospital admission and to maximise the number of beds available for elective admissions. The philosophy of care must shift emphasis from admission to assessment to ensure appropriateness of admission and maximise bed availability for elective admissions. Admissions and Discharge Guidelines - 16",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 17,
+                            "doc_id": "6dadb8c02fcf1d7809b42f49c22c22e1"
+                        }
+                    },
+                    {
+                        "content": "clear and consistent guidelines for conducting billing and collections functions in a manner that promotes compliance, patient satisfaction, and efficiency. Through the use of billing statements, written correspondence, and phone calls, Major Hospital will make diligent efforts to inform patients of their financial responsibilities and available financial assistance options, as well as follow up with patients regarding outstanding accounts. Additionally, this Policy requires Major Hospital to make reasonable efforts to determine a patient’s eligibility for financial assistance before engaging in Extraordinary Collection Actions to obtain payment. This Policy applies to all sums due from",
+                        "metadata": {
+                            "source": "hospital_collection.pdf",
+                            "page": 1,
+                            "doc_id": "c00a3ee7f0f096bba2ef104750c5e85c"
+                        }
+                    },
+                    {
+                        "content": "Strategic objectives The key strategic objectives underpinning an effective and coherent admissions and discharge policy for emergency and elective patients are: • The provision of an integrated personal health and social services system resulting in seamless patient centred care at all times. • The utilisation of resources to maximise clinical and organisational effectiveness and outcomes. • The establishment of fully integrated networks of acute care which are accessible to each person. • The provision of levels of local access to acute care whilst at the same time ensuring high quality clinical care. • The acquisition of clinical admissions data to assist service planning and monitoring.",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 9,
+                            "doc_id": "fc48674b3c7a49e9967f76ad7a401053"
+                        }
+                    },
+                    {
+                        "content": "pre-admission. On admission, the patient’s pre-morbid and functional status information are documented in order to inform discharge planning and to identify patients at risk on returning home. In this way, referrals to inter-hospital and community services are initiated in a timely manner. What are the principles of effective discharge planning? The core principles for effective discharge planning are: • A patient’s use of a hospital bed and their discharge should be planned before their admission, where possible. • The estimated date of discharge should be documented and communicated to the patient and relevant personnel within 24 hours of admission. • Discharge should be “streamlined”",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 20,
+                            "doc_id": "39c6fd229bd0d7e88816d0d7f19cddc9"
+                        }
+                    },
+                    {
+                        "content": "Admissions and Discharge Guidelines - 24",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 25,
+                            "doc_id": "b7875fe6fcd1c3cc2d1d84f7e140d35e"
+                        }
+                    },
+                    {
+                        "content": "whilst at the same time ensuring high quality clinical care. • The acquisition of clinical admissions data to assist service planning and monitoring. Admissions and Discharge Guidelines - 8",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 9,
+                            "doc_id": "fc48674b3c7a49e9967f76ad7a401053"
+                        }
+                    },
+                    {
+                        "content": "to our patients. Therefore it is strongly recommended that services should be delivered in adherence to these guidelines. It is now planned that they will be used as a measurement tool to evaluate the effectiveness of admissions and discharges nationally and the outcomes achieved relative to the aims set out in the document. Admissions and Discharge Guidelines - 21",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 22,
+                            "doc_id": "ec073a432267908871b1c621a04779e0"
+                        }
+                    },
+                    {
+                        "content": "at the time of their admission, and to ensure that patients are cared for by staff with the appropriate expertise. What are the key processes for effective elective admissions? The following key requirements have been identified to facilitate effective elective admission practices: • Centralised waiting list management and agreement on the parameters for scheduling theatre lists with clinicians. • Pre-admission assessment should be a standard requirement for all elective admissions to ensure appropriate planning of the entire patient journey. Admissions and Discharge Guidelines - 18",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 19,
+                            "doc_id": "09dcc7cc3ef3895c8db574ee96928dd2"
+                        }
+                    },
+                    {
+                        "content": "The active management of admissions and discharges should ensure that: • Beds are available for emergency admissions. • Beds are available for elective patients; this assists in keeping waiting lists down. • The quality and appropriateness of patient care is high. • Patients get the care they require when they are discharged from hospital. • Scarce financial resources are not wasted and value for money is achieved.4 Quality and safety To ensure that all patients admitted to hospital receive the high quality and safe service to which they are entitled, resources must be efficiently and effectively utilised. Services are organised so that patients, depending on their needs, can move smoothly",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 11,
+                            "doc_id": "67cc981501baed3e6723918f0d254cab"
+                        }
+                    },
+                    {
+                        "content": "are not intended to be prescriptive rather they should act as a reference or guide to people working within the system, supporting the overall commitment to delivering better quality health services. Finally, I would like to thank the project team who, in consultation with a wide range of people, produced these guidelines. Denis Doherty Director The Health Boards Executive Admissions and Discharge Guidelines - 5",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 6,
+                            "doc_id": "5db0906009c7e290a3ed6e1de72e0234"
+                        }
+                    },
+                    {
+                        "content": "What are the Principles Underpinning Best Practice in Hospital Admissions? A number of principles should underpin the development of an effective emergency and elective admissions and discharge planning function. These include: • The provision of patient centred services, which are accessible to the population without compromising safety, quality and clinical standards, to the right people in the right location and at the right time.1 • Patients should be consulted and included in all decisions about their care. • Clinical practice and care should be based on the most up to date evidence. • Co-operation and clinical networking between hospitals and between care groups are essential to",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 10,
+                            "doc_id": "135b2dfc557ab703c449cf87a6c86554"
+                        }
+                    },
+                    {
+                        "content": "effective service delivery, including: - Referral guidelines and protocols for consultant care and diagnostic services. - Discharge plans agreed between the hospital and a key worker in primary care. - Discharge planning that commences on day of admission. - Efficient communication from acute care service providers e.g. discharge letter accompany patient or/and e-mailed to GPs and key worker on or before the day of discharge. - Integrated care pathways facilitated by key workers. - Individual care plans appropriate to the needs of the patient and their carers are developed by the multidisciplinary team and in collaboration with them e.g. chronic disease management. - Shared care",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 16,
+                            "doc_id": "6acdd8a397c67c3cb539b7a79931f1e3"
+                        }
+                    },
+                    {
+                        "content": "balance and monitor the competing demands of emergency and elective pressures ensuring all bed and theatre resources are fully utilised.8 Discharge planning Discharge from hospital is a process, not an isolated event. It involves the development and implementation of a plan to facilitate the transfer of an individual from hospital to an alternative setting where appropriate. Components of the system (family, carers, hospitals, primary care providers, community services and social services) must work together. Activity and performance standards should be frequently monitored and there should be openness to innovative solutions. This will ensure that the whole systems approach to admissions",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 12,
+                            "doc_id": "c118fae71cea63894549b957f9b12703"
+                        }
+                    },
+                    {
+                        "content": "Strategy, Quality and Fairness (DOHC 2001) which states, among other things, that “The discharge planning function in each acute hospital will be enhanced to ensure that patients do not have to remain in hospital for any longer than necessary” (Action 84) 1 “Admission protocols will ensure that emergency patients will be the only group of patients admitted to the hospital through the A & E Department” (Action 86)1 This document is based on international best practice, focusing on a “whole systems approach” to effectively address elective and emergency admissions and discharges. Grounded in the principle of “people-centredness” which, increasingly, influences the planning and delivery of",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 7,
+                            "doc_id": "3bb19654c4d3a964ead2382ab04857de"
+                        }
+                    }
+                ],
+                "reranked_documents": [
+                    {
+                        "content": "Admissions and Discharge Guidelines Health Strategy Implementation Project 2003",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 1,
+                            "doc_id": "0aec2b583d145d3667a655a3aeac2a63"
+                        }
+                    },
+                    {
+                        "content": "admission to more rigorous assessment to ensure the appropriateness of hospital admission and to maximise the number of beds available for elective admissions. The philosophy of care must shift emphasis from admission to assessment to ensure appropriateness of admission and maximise bed availability for elective admissions. Admissions and Discharge Guidelines - 16",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 17,
+                            "doc_id": "6dadb8c02fcf1d7809b42f49c22c22e1"
+                        }
+                    },
+                    {
+                        "content": "clear and consistent guidelines for conducting billing and collections functions in a manner that promotes compliance, patient satisfaction, and efficiency. Through the use of billing statements, written correspondence, and phone calls, Major Hospital will make diligent efforts to inform patients of their financial responsibilities and available financial assistance options, as well as follow up with patients regarding outstanding accounts. Additionally, this Policy requires Major Hospital to make reasonable efforts to determine a patient’s eligibility for financial assistance before engaging in Extraordinary Collection Actions to obtain payment. This Policy applies to all sums due from",
+                        "metadata": {
+                            "source": "hospital_collection.pdf",
+                            "page": 1,
+                            "doc_id": "c00a3ee7f0f096bba2ef104750c5e85c"
+                        }
+                    },
+                    {
+                        "content": "Strategic objectives The key strategic objectives underpinning an effective and coherent admissions and discharge policy for emergency and elective patients are: • The provision of an integrated personal health and social services system resulting in seamless patient centred care at all times. • The utilisation of resources to maximise clinical and organisational effectiveness and outcomes. • The establishment of fully integrated networks of acute care which are accessible to each person. • The provision of levels of local access to acute care whilst at the same time ensuring high quality clinical care. • The acquisition of clinical admissions data to assist service planning and monitoring.",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 9,
+                            "doc_id": "fc48674b3c7a49e9967f76ad7a401053"
+                        }
+                    },
+                    {
+                        "content": "pre-admission. On admission, the patient’s pre-morbid and functional status information are documented in order to inform discharge planning and to identify patients at risk on returning home. In this way, referrals to inter-hospital and community services are initiated in a timely manner. What are the principles of effective discharge planning? The core principles for effective discharge planning are: • A patient’s use of a hospital bed and their discharge should be planned before their admission, where possible. • The estimated date of discharge should be documented and communicated to the patient and relevant personnel within 24 hours of admission. • Discharge should be “streamlined”",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 20,
+                            "doc_id": "39c6fd229bd0d7e88816d0d7f19cddc9"
+                        }
+                    },
+                    {
+                        "content": "Admissions and Discharge Guidelines - 24",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 25,
+                            "doc_id": "b7875fe6fcd1c3cc2d1d84f7e140d35e"
+                        }
+                    },
+                    {
+                        "content": "whilst at the same time ensuring high quality clinical care. • The acquisition of clinical admissions data to assist service planning and monitoring. Admissions and Discharge Guidelines - 8",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 9,
+                            "doc_id": "fc48674b3c7a49e9967f76ad7a401053"
+                        }
+                    },
+                    {
+                        "content": "to our patients. Therefore it is strongly recommended that services should be delivered in adherence to these guidelines. It is now planned that they will be used as a measurement tool to evaluate the effectiveness of admissions and discharges nationally and the outcomes achieved relative to the aims set out in the document. Admissions and Discharge Guidelines - 21",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 22,
+                            "doc_id": "ec073a432267908871b1c621a04779e0"
+                        }
+                    },
+                    {
+                        "content": "at the time of their admission, and to ensure that patients are cared for by staff with the appropriate expertise. What are the key processes for effective elective admissions? The following key requirements have been identified to facilitate effective elective admission practices: • Centralised waiting list management and agreement on the parameters for scheduling theatre lists with clinicians. • Pre-admission assessment should be a standard requirement for all elective admissions to ensure appropriate planning of the entire patient journey. Admissions and Discharge Guidelines - 18",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 19,
+                            "doc_id": "09dcc7cc3ef3895c8db574ee96928dd2"
+                        }
+                    },
+                    {
+                        "content": "The active management of admissions and discharges should ensure that: • Beds are available for emergency admissions. • Beds are available for elective patients; this assists in keeping waiting lists down. • The quality and appropriateness of patient care is high. • Patients get the care they require when they are discharged from hospital. • Scarce financial resources are not wasted and value for money is achieved.4 Quality and safety To ensure that all patients admitted to hospital receive the high quality and safe service to which they are entitled, resources must be efficiently and effectively utilised. Services are organised so that patients, depending on their needs, can move smoothly",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 11,
+                            "doc_id": "67cc981501baed3e6723918f0d254cab"
+                        }
+                    },
+                    {
+                        "content": "are not intended to be prescriptive rather they should act as a reference or guide to people working within the system, supporting the overall commitment to delivering better quality health services. Finally, I would like to thank the project team who, in consultation with a wide range of people, produced these guidelines. Denis Doherty Director The Health Boards Executive Admissions and Discharge Guidelines - 5",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 6,
+                            "doc_id": "5db0906009c7e290a3ed6e1de72e0234"
+                        }
+                    },
+                    {
+                        "content": "What are the Principles Underpinning Best Practice in Hospital Admissions? A number of principles should underpin the development of an effective emergency and elective admissions and discharge planning function. These include: • The provision of patient centred services, which are accessible to the population without compromising safety, quality and clinical standards, to the right people in the right location and at the right time.1 • Patients should be consulted and included in all decisions about their care. • Clinical practice and care should be based on the most up to date evidence. • Co-operation and clinical networking between hospitals and between care groups are essential to",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 10,
+                            "doc_id": "135b2dfc557ab703c449cf87a6c86554"
+                        }
+                    },
+                    {
+                        "content": "effective service delivery, including: - Referral guidelines and protocols for consultant care and diagnostic services. - Discharge plans agreed between the hospital and a key worker in primary care. - Discharge planning that commences on day of admission. - Efficient communication from acute care service providers e.g. discharge letter accompany patient or/and e-mailed to GPs and key worker on or before the day of discharge. - Integrated care pathways facilitated by key workers. - Individual care plans appropriate to the needs of the patient and their carers are developed by the multidisciplinary team and in collaboration with them e.g. chronic disease management. - Shared care",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 16,
+                            "doc_id": "6acdd8a397c67c3cb539b7a79931f1e3"
+                        }
+                    },
+                    {
+                        "content": "balance and monitor the competing demands of emergency and elective pressures ensuring all bed and theatre resources are fully utilised.8 Discharge planning Discharge from hospital is a process, not an isolated event. It involves the development and implementation of a plan to facilitate the transfer of an individual from hospital to an alternative setting where appropriate. Components of the system (family, carers, hospitals, primary care providers, community services and social services) must work together. Activity and performance standards should be frequently monitored and there should be openness to innovative solutions. This will ensure that the whole systems approach to admissions",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 12,
+                            "doc_id": "c118fae71cea63894549b957f9b12703"
+                        }
+                    },
+                    {
+                        "content": "Strategy, Quality and Fairness (DOHC 2001) which states, among other things, that “The discharge planning function in each acute hospital will be enhanced to ensure that patients do not have to remain in hospital for any longer than necessary” (Action 84) 1 “Admission protocols will ensure that emergency patients will be the only group of patients admitted to the hospital through the A & E Department” (Action 86)1 This document is based on international best practice, focusing on a “whole systems approach” to effectively address elective and emergency admissions and discharges. Grounded in the principle of “people-centredness” which, increasingly, influences the planning and delivery of",
+                        "metadata": {
+                            "source": "admission_and_discharge_guidelines_2003.pdf",
+                            "page": 7,
+                            "doc_id": "3bb19654c4d3a964ead2382ab04857de"
+                        }
+                    }
+                ]
+            },
+            "retrieval_stats": {
+                "retrieved": 15,
+                "after_reranker": 15
+            },
+            "metrics": {
+                "faithfulness": 1.0,
+                "answer_relevancy": 0.8473691507134907,
+                "context_precision": 0.22440476189915176,
+                "context_recall": 1.0
+            }
+        }
+    ]
+}

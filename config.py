@@ -74,7 +74,7 @@ USE_RERANKER = os.getenv(
 
 RETRIEVAL_MODE = os.getenv("RETRIEVAL_MODE", "faiss").lower()
 
-DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+DEBUG = os.getenv("DEBUG", "false").lower() == "false"
 # --------------------------------------------------
 # Large Language Model
 # --------------------------------------------------

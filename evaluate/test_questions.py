@@ -187,5 +187,5 @@ TEST_DATA = [
         "ground_truth": "Extended payment plans that last between 4 and 18 months incur a processing fee of $3.00 per month.",
         "source_doc": "hospital_collection.pdf",
         "notes": "Financial detail retrieval."
-    }
+    },
 ]

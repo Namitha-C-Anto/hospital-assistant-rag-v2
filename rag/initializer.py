@@ -7,21 +7,42 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from ragas.llms import LangchainLLMWrapper 
 from rag.models import PipelineComponents
 
-def initialize_pipeline():
-    
+def initialize_pipeline() -> PipelineComponents:
+    """
+    Initialize and return all components required for the RAG pipeline.
+
+    This includes:
+    - Loading the persisted vector store
+    - Creating retrieval components (FAISS + BM25)
+    - Initializing the application LLM
+    - Initializing the evaluation (RAGAS) LLM and embedding model
+
+    Returns:
+        PipelineComponents: Container holding all initialized pipeline objects.
+    """
+
+    # -------------------------------------------------
+    # 1. Load vector store and create retrievers
+    # -------------------------------------------------
     vectorstore = load_vectorstore()
 
     retriever = create_retriever(vectorstore)
 
+    # Individual retrievers used for evaluation experiments
     faiss_retriever = retriever["faiss"]
     bm25_retriever = retriever["bm25"]
 
-    #JUDGE_MODEL = LLM_MODEL
+    # -------------------------------------------------
+    # 2. Initialize LLM used as the RAGAS evaluation judge
+    # -------------------------------------------------
     judge_llm = ChatOpenAI(
         model=JUDGE_MODEL,
         api_key=OPENAI_API_KEY,
     )
 
+    # -------------------------------------------------
+    # 3. Initialize embedding model for RAGAS metrics
+    # -------------------------------------------------
     ragas_llm = LangchainLLMWrapper(judge_llm) 
 
     hf_embeddings = HuggingFaceEmbeddings(
@@ -32,12 +53,16 @@ def initialize_pipeline():
         hf_embeddings
     )
     # -------------------------------------------------
-    # 2. Run RAG pipeline on test questions
+    # 4. Initialize the application LLM used for answer generation
     # -------------------------------------------------
     app_llm = ChatOpenAI(
         model= LLM_MODEL,
         api_key= OPENAI_API_KEY,
         )
+
+    # -------------------------------------------------
+    # 5. Return all initialized components
+    # -------------------------------------------------
     return PipelineComponents(
         vectorstore=vectorstore,
         retriever=retriever,

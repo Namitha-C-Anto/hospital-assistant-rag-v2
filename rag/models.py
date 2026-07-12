@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Dict, Any, List
 from langchain_openai import ChatOpenAI
+from typing import Optional
 
 @dataclass
 class DocumentInfo:
@@ -31,16 +32,6 @@ class RetrievedContext:
     retrieved_documents: List[DocumentInfo] = field(default_factory=list)
     reranked_documents: List[DocumentInfo] = field(default_factory=list)
 
-@dataclass
-class PipelineResult:
-    question: str
-    answer: str = ""
-    reference: str = ""
-
-    latency: Latency = field(default_factory=Latency)
-    usage: TokenUsage = field(default_factory=TokenUsage)
-    retrieval: RetrievedContext = field(default_factory=RetrievedContext)
-    retrieval_stats: RetrievalStats = field(default_factory=RetrievalStats)
 
 @dataclass
 class Metrics:
@@ -53,6 +44,18 @@ class Metrics:
 
     context_recall: float = 0
     
+@dataclass
+class PipelineResult:
+    question: str
+    answer: str = ""
+    reference: str = ""
+    ground_truth: str = ""
+    latency: Latency = field(default_factory=Latency)
+    usage: TokenUsage = field(default_factory=TokenUsage)
+    retrieval: RetrievedContext = field(default_factory=RetrievedContext)
+    retrieval_stats: RetrievalStats = field(default_factory=RetrievalStats)
+    metrics: Optional[Metrics] = None
+
 @dataclass
 class PipelineRequest:
     question: str
