@@ -1,45 +1,53 @@
 import time
-from utils.logger import logger
-from rag.retrieval import run_retrieval_pipeline
-from rag.generation import generate_answer
-from rag.models import PipelineResult, Latency, RetrievalStats, TokenUsage, PipelineComponents
-from evaluate.logging import log_pipeline_stats, log_debug_info
+from typing import Any 
+
 from config import DEBUG
-from typing import Any
+from utils.logger import logger
+from evaluate.logging import (
+    log_pipeline_stats, 
+    log_debug_info,)
+from rag.generation import generate_answer
+from rag.models import (
+    PipelineResults, 
+    Latency, 
+    RetrievalStats, 
+    TokenUsage, 
+    PipelineComponents,)
+from rag.retrieval import run_retrieval_pipeline
 
 def run_test_questions(
     test_data: list[dict[str, Any]],
-    components: PipelineComponents,
-) -> list[PipelineResult]:
+    rag_components: PipelineComponents,
+) -> list[PipelineResults]:
 
     """Run the RAG pipeline for all test questions.
 
     Args:
         test_data: List of test questions and reference answers.
-        components: Initialized RAG pipeline components.
+        rag_components: Initialized RAG pipeline components.
 
     Returns:
         List of evaluation results for successfully processed questions.
     """
-    evaluation_results = []
+    pipeline_results = []
 
     logger.info("Running RAG on test questions...")
 
     # Execute the RAG pipeline for each test question.
     for item in test_data:
-        result = run_single_question(item, components)
+        result = process_test_questions(item, rag_components)
 
         # Skip questions that failed during pipeline execution.
         if result is not None:
-            evaluation_results.append(result)
+            pipeline_results.append(result)
 
-    return evaluation_results
+    return pipeline_results
 
 #------------------------------------------------------
-def run_single_question(
+def process_test_questions(
     item: dict[str, Any],
-    components: PipelineComponents,
-) -> PipelineResult | None:
+    rag_components: PipelineComponents,
+) -> PipelineResults | None:
 
     """
     Execute the complete RAG pipeline for a single test question.
@@ -53,7 +61,7 @@ def run_single_question(
 
     Args:
         item: Test question containing the input question and ground truth.
-        components: Initialized RAG pipeline components.
+        rag_components: Initialized RAG pipeline components.
 
     Returns:
         PipelineResult containing the generated answer and evaluation metadata,
@@ -71,8 +79,8 @@ def run_single_question(
         # -------------------------------------------------
         retrieval_result, retrieval_time, reranker_time = run_retrieval_pipeline(
                 question,
-                components.faiss_retriever,
-                components.bm25_retriever,
+                rag_components.faiss_retriever,
+                rag_components.bm25_retriever, 
             )
 
         # Combine retrieved contexts into a single prompt for the LLM.
@@ -87,7 +95,7 @@ def run_single_question(
         answer, usage, prompt_time, generation_time = generate_answer(
                 question,
                 context_text,
-                components.app_llm,
+                rag_components.app_llm,
             )
 
         # Calculate total pipeline execution time.
@@ -96,7 +104,7 @@ def run_single_question(
         # -------------------------------------------------
         # 3. Build structured pipeline result
         # -------------------------------------------------
-        result = PipelineResult(
+        result = PipelineResults(
                     question=question,
                     answer=answer,
                     reference=item["ground_truth"],

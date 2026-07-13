@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from langchain_openai import ChatOpenAI
-from typing import Optional
 
 @dataclass
 class DocumentInfo:
@@ -45,7 +44,7 @@ class Metrics:
     context_recall: float = 0
     
 @dataclass
-class PipelineResult:
+class PipelineResults:
     question: str
     answer: str = ""
     reference: str = ""
@@ -69,6 +68,9 @@ class PipelineComponents:
     faiss_retriever: object
     bm25_retriever: object
     app_llm: ChatOpenAI
+
+@dataclass
+class EvaluationComponents:
     judge_llm: ChatOpenAI
     ragas_llm: object
     ragas_embeddings: object

@@ -49,7 +49,7 @@ def build_retrieval_result(docs, reranked_results):
 def run_retrieval_pipeline(
     question,
     faiss_retriever,
-    bm25_retriever,
+    bm25_retriever
 ):
  
     retrieval_start = time.perf_counter()

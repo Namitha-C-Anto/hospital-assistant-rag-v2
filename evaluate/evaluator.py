@@ -1,13 +1,23 @@
 from evaluate.test_questions import TEST_DATA
-from utils.logger import logger
-from rag.initializer import initialize_pipeline
-from evaluate.runner import run_test_questions
-from evaluate.ragas_runner import run_ragas_evaluation, attach_ragas_metrics
-from utils.experiment import create_experiment_metadata
-from evaluate.result_writer import add_metadata, save_results
-from evaluate.display import display_ragas_results
+from evaluate.rag_runner import run_test_questions
+from evaluate.ragas_runner import (
+    run_ragas_evaluation, 
+    attach_metrics_to_pipeline_results,)
+from evaluate.result_writer import (
+    add_metadata, 
+    save_results,)
+from evaluate.display import display_ragas_summary
 from evaluate.summary import build_summary
-from evaluate.logging import log_df_info, log_avg_scores
+from evaluate.logging import (
+    log_df_info, 
+    log_avg_scores,)
+
+from rag.initializer import (
+    initialize_rag, 
+    initialize_ragas,)
+
+from utils.logger import logger
+from utils.experiment import create_experiment_metadata
 
 def main():
 
@@ -16,38 +26,39 @@ def main():
     logger.info("Starting RAG evaluation...")
 
     # Initialize
-    components = initialize_pipeline()
+    rag_components = initialize_rag()
+    ragas_components = initialize_ragas()
     
     # Run RAG pipeline
-    evaluation_results = run_test_questions(
+    pipeline_results = run_test_questions(
         TEST_DATA, 
-        components,
+        rag_components,
     )
 
     # Evaluate with RAGAS
-    results, ragas_time = run_ragas_evaluation(
-        evaluation_results, 
-        components,
+    ragas_results, ragas_time = run_ragas_evaluation(
+        pipeline_results, 
+        ragas_components,
     )
 
     # Prepare results
-    df = attach_ragas_metrics(
-        results, 
-        evaluation_results,
+    df = attach_metrics_to_pipeline_results(
+        ragas_results, 
+        pipeline_results,
     )
 
-    metadata = create_experiment_metadata()
+    metadata = create_experiment_metadata() 
     df = add_metadata(
         df,
         metadata,
     )
 
     # Display
-    display_ragas_results(df)
+    display_ragas_summary(df)
 
     summary = build_summary(
         TEST_DATA, 
-        evaluation_results, 
+        pipeline_results, 
         ragas_time, 
         df,
     ) 
@@ -60,7 +71,7 @@ def main():
         metadata, 
         summary, 
         TEST_DATA, 
-        evaluation_results,
+        pipeline_results,
     )
 
 if __name__ == "__main__":
