@@ -22,27 +22,39 @@ def reciprocal_rank_fusion(
     scores = defaultdict(float)
     doc_map = {}
 
-    for ranked_docs in ranked_lists:
+    # -------------------------------------------------
+    # Compute RRF scores for documents across all
+    # ranked retrieval results.
+    # -------------------------------------------------
+    for ranked_documents in ranked_lists:
 
-        for rank, doc in enumerate(ranked_docs):
+        for rank, document in enumerate(ranked_documents):
 
-            # unique key
+            # Create a unique identifier for each document.
             key = (
-                doc.metadata.get("source"),
-                doc.metadata.get("page"),
-                doc.page_content,
+                document.metadata.get("source"),
+                document.metadata.get("page"),
+                document.page_content,
             )
 
+            # Update the Reciprocal Rank Fusion score.
             scores[key] += 1 / (k + rank + 1)
 
-            doc_map[key] = doc
+            # Keep a reference to the original document.
+            doc_map[key] = document
 
+    # -------------------------------------------------
+    # Sort documents by descending RRF score.
+    # -------------------------------------------------
     ranked = sorted(
         scores.items(),
-        key=lambda x: x[1],
+        key=lambda item: item[1],
         reverse=True,
     )
 
+    # -------------------------------------------------
+    # Return the top-ranked fused documents.
+    # -------------------------------------------------
     return [
         doc_map[key]
         for key, _ in ranked[:top_n]

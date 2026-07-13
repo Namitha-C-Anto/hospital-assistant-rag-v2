@@ -44,9 +44,6 @@ CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", 200))
 # --------------------------------------------------
 # Retriever Configuration
 # --------------------------------------------------
-# --------------------------------------------------
-# Retriever Configuration
-# --------------------------------------------------
 TOP_K = int(os.getenv("TOP_K", 5))
 FETCH_K = int(os.getenv("FETCH_K", 20))
 

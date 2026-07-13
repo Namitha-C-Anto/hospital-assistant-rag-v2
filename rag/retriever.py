@@ -1,3 +1,8 @@
+from typing import Optional
+from langchain_core.documents import Document
+from langchain_core.retrievers import BaseRetriever
+from langchain_community.retrievers import BM25Retriever
+
 from config import (
     SEARCH_TYPE,
     TOP_K,
@@ -6,13 +11,8 @@ from config import (
     CHUNKS_PATH,
     RETRIEVAL_MODE,
 )
-
-from langchain_community.retrievers import BM25Retriever
 from rag.storage import load_chunks
 from rag.rrf import reciprocal_rank_fusion
-from typing import Optional
-from langchain_core.documents import Document
-from langchain_core.retrievers import BaseRetriever
  
 
 def create_retriever(

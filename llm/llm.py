@@ -1,11 +1,16 @@
 from langchain_openai import ChatOpenAI
-from config import OPENAI_API_KEY, TEMPERATURE
+from config import (
+    OPENAI_API_KEY, 
+    TEMPERATURE, 
+    LLM_MODEL,)
 
-def get_llm():
+def get_llm()-> ChatOpenAI:
+    """
+    Create and return the configured ChatOpenAI model.
+    """
         
-    llm = ChatOpenAI(
-        model= "gpt-5-nano",
-        api_key= OPENAI_API_KEY,
+    return ChatOpenAI(
+        model=LLM_MODEL,
+        api_key=OPENAI_API_KEY,
         temperature=TEMPERATURE
     )
-    return llm

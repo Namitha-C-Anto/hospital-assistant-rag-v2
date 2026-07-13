@@ -6,14 +6,13 @@ from utils.logger import logger
 from evaluate.logging import (
     log_pipeline_stats, 
     log_debug_info,)
-from rag.generation import generate_answer
 from rag.models import (
     PipelineResults, 
     Latency, 
     RetrievalStats, 
     TokenUsage, 
     PipelineComponents,)
-from rag.retrieval import run_retrieval_pipeline
+from rag.pipeline import run_rag_pipeline
 
 def run_test_questions(
     test_data: list[dict[str, Any]],
@@ -73,30 +72,11 @@ def process_test_questions(
     pipeline_start = time.perf_counter()
 
     try:
-
-        # -------------------------------------------------
-        # 1. Retrieve and rerank relevant documents
-        # -------------------------------------------------
-        retrieval_result, retrieval_time, reranker_time = run_retrieval_pipeline(
-                question,
-                rag_components.faiss_retriever,
-                rag_components.bm25_retriever, 
-            )
-
-        # Combine retrieved contexts into a single prompt for the LLM.
-        context_text = "\n\n---\n\n".join(
-            doc.content
-            for doc in retrieval_result.reranked_documents
-            )
-
-        # -------------------------------------------------
-        # 2. Generate answer using the application LLM
-        # -------------------------------------------------    
-        answer, usage, prompt_time, generation_time = generate_answer(
-                question,
-                context_text,
-                rag_components.app_llm,
-            )
+        
+        pipeline_result = run_rag_pipeline(
+            question,
+            rag_components,
+        )
 
         # Calculate total pipeline execution time.
         pipeline_time = round(time.perf_counter() - pipeline_start,4)
@@ -106,29 +86,29 @@ def process_test_questions(
         # -------------------------------------------------
         result = PipelineResults(
                     question=question,
-                    answer=answer,
+                    answer=pipeline_result.answer,
                     reference=item["ground_truth"],
                     ground_truth = item["ground_truth"],
                     
                     latency=Latency(
-                        retrieval_seconds=retrieval_time,
-                        reranker_seconds=reranker_time,
-                        generation_seconds=generation_time,
+                        retrieval_seconds=pipeline_result.retrieval_time,
+                        reranker_seconds=pipeline_result.reranker_time,
+                        generation_seconds=pipeline_result.generation_time,
                         pipeline_seconds=pipeline_time,
-                        prompt_seconds=prompt_time,
+                        prompt_seconds=pipeline_result.prompt_time,
                     ),
 
                     retrieval_stats=RetrievalStats(
-                        retrieved=len(retrieval_result.retrieved_documents),
-                        after_reranker=len(retrieval_result.reranked_documents)
+                        retrieved=len(pipeline_result.retrieval_result.retrieved_documents),
+                        after_reranker=len(pipeline_result.retrieval_result.reranked_documents)
                     ),
 
-                    retrieval=retrieval_result, 
+                    retrieval=pipeline_result.retrieval_result, 
 
                     usage=TokenUsage(
-                        prompt_tokens=usage.get("prompt_tokens", 0),
-                        completion_tokens=usage.get("completion_tokens", 0),
-                        total_tokens=usage.get("total_tokens", 0),
+                        prompt_tokens=pipeline_result.usage.get("prompt_tokens", 0),
+                        completion_tokens=pipeline_result.usage.get("completion_tokens", 0),
+                        total_tokens=pipeline_result.usage.get("total_tokens", 0),
                     ), 
                     metrics = None,
                 )
@@ -136,9 +116,9 @@ def process_test_questions(
         # Log pipeline performance metrics.
         log_pipeline_stats(
             question,
-            retrieval_time,
-            reranker_time,
-            generation_time,
+            pipeline_result.retrieval_time,
+            pipeline_result.reranker_time,
+            pipeline_result.generation_time,
             pipeline_time,
         )
 
@@ -146,10 +126,10 @@ def process_test_questions(
         if DEBUG:
             log_debug_info(
                 question,
-                answer,
+                pipeline_result.answer,
                 item["ground_truth"],
-                context_text,
-                retrieval_result,
+                pipeline_result.context,
+                pipeline_result.retrieval_result,
             )
         return result
 
