@@ -70,8 +70,11 @@ USE_RERANKER = os.getenv(
 ).lower() == "true"
 
 RETRIEVAL_MODE = os.getenv("RETRIEVAL_MODE", "faiss").lower()
-
-DEBUG = os.getenv("DEBUG", "false").lower() == "false"
+ 
+DEBUG = os.getenv(
+    "DEBUG",
+    "false"
+).lower() == "true"
 
 # --------------------------------------------------
 # Large Language Model
@@ -90,9 +93,6 @@ JUDGE_MODEL = os.getenv(
 # --------------------------------------------------
 # Streamlit Application
 # --------------------------------------------------
-
-#APP_TITLE = "## 🏥 Hospital Assistant"
-import streamlit as st
 
 # 1. Define the variable with the SVG code
 APP_TITLE = """
@@ -138,7 +138,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 if not OPENAI_API_KEY:
     raise ValueError(
         "OPENAI_API_KEY is missing. "
-        "Please add it to your .env file."
+        "Set it as an environment variable or Streamlit Secret."
     )
 
 if not GROQ_API_KEY:
