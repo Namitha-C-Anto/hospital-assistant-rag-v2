@@ -3,17 +3,31 @@ import streamlit as st
 from config import (
     DB_PATH, 
     APP_TITLE, 
-    SUB_TITLE,)
+    WELCOME_TITLE,
+    WELCOME_SUBTITLE,
+    WELCOME_CAPTION,)
+from ui import example_questions
 from utils.logger import logger     
 from rag.pipeline import run_rag_pipeline  
 from rag.initializer import initialize_rag 
-from memory.session_memory import (
+
+from memory.chat_manager import (
+    initialize_chat_sessions,
+    rename_chat,
     get_chat_history, 
     format_chat_history, 
-    save_chat,)
+    save_chat,
+    switch_chat,
+    list_chats,)
 from rag.builder import build_vector_database
 from rag.models import PipelineComponents
+from ui.styles import load_css
+from ui.sidebar import render_sidebar
+from ui.welcome import render_welcome
+from ui.example_questions import render_example_questions
+from ui.sources import render_sources
 
+load_css()
 # -------------------------------------------------
 # Load and cache initialized RAG components.
 # This prevents reloading the vector database and
@@ -28,7 +42,10 @@ def main() -> None:
     """
     Run the Streamlit Hospital Policy RAG application.
     """
-
+    
+    #Step 1: Initialize the session state
+    initialize_chat_sessions()
+        
     # -------------------------------------------------
     # Create the vector database on first launch if it
     # does not already exist.
@@ -37,11 +54,15 @@ def main() -> None:
         build_vector_database()
         
     # -------------------------------------------------
-    # Display the application header.
+    # Display the Side bar
     # -------------------------------------------------
-    st.title(APP_TITLE)
-    st.caption(SUB_TITLE)
-
+    with st.sidebar:
+        render_sidebar()
+        
+        if "last_pipeline_result" in st.session_state:
+            render_sources(
+                st.session_state.last_pipeline_result
+            )
     # -------------------------------------------------
     # Load cached RAG components.
     # -------------------------------------------------
@@ -51,6 +72,9 @@ def main() -> None:
     # Restore and display previous chat messages.
     # -------------------------------------------------
     chat_history = get_chat_history()
+
+    if not chat_history:
+        render_welcome()
 
     for chat in chat_history:
 
@@ -63,6 +87,18 @@ def main() -> None:
                 chat["answer"]
             )
 
+    #------------------------------------------------------------    
+    if not chat_history:
+        st.markdown("##### 💡 Try asking")
+        
+        example_questions = render_example_questions()
+        columns = st.columns(2)
+
+        for i, q in enumerate(example_questions):
+            with columns[i % 2]:
+                if st.button(q, use_container_width=True):
+                    st.session_state.selected_question = q
+
     # -------------------------------------------------
     # Accept a new user question.
     # -------------------------------------------------
@@ -70,8 +106,12 @@ def main() -> None:
         "Ask your hospital-related question"
     )
 
+    # If an example question was clicked, use it instead
+    if "selected_question" in st.session_state:
+        question = st.session_state.pop("selected_question")
+
     if question:
-        
+         
         logger.info(f"Processing question: {question}")
 
         # -------------------------------------------------
@@ -80,47 +120,27 @@ def main() -> None:
         # -------------------------------------------------
         history_text = format_chat_history(chat_history)
 
-        pipeline_result = run_rag_pipeline(
-                question,
-                rag_components,
-                chat_history = history_text,
-            ) 
-
         # -------------------------------------------------
         # Display the latest conversation.
         # -------------------------------------------------
         with st.chat_message("user"):
             st.write(question)
-
+        
         with st.chat_message("assistant"):
+            with st.spinner("Searching and generating answer..."):
+                pipeline_result = run_rag_pipeline(
+                    question,
+                    rag_components,
+                    chat_history=history_text,
+                )
             st.write(pipeline_result.answer)
+            st.session_state.last_pipeline_result = pipeline_result
     
         # Save conversation for future turns.
         save_chat(question, pipeline_result.answer)
-
-        # -------------------------------------------------
-        # Display retrieved document chunks used to
-        # generate the answer.
-        # -------------------------------------------------
-        with st.expander("Retrieved Context"):
+        rename_chat(question)
+                  
+        st.rerun()
             
-            for document in pipeline_result.retrieval_result.retrieved_documents:
-                
-                pdf_name = os.path.basename(
-                    document.metadata.get("source", "Unknown PDF")
-                ) 
-                
-                page_no = document.metadata.get("page", "Unknown Page")
-                
-                st.write(
-                    f"📄 PDF: {pdf_name}"
-                )
-                st.write(
-                    f"📍Page: {page_no}"
-                )
-
-                st.write(document.content[:500])
-                st.divider()
-
 if __name__ == "__main__":
     main()
