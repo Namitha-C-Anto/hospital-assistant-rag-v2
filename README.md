@@ -1,182 +1,302 @@
----
+# 🏥 Hospital Assistant RAG v2
 
-title: Hospital Assistant RAG
-emoji: 🚀
-colorFrom: red
-colorTo: red
-sdk: streamlit
-app_file: app.py
-pinned: false
-short_description: AI-powered Hospital Assistant using RAG and FAISS vector search
+An AI-powered conversational assistant that answers hospital policy and patient service questions using **Retrieval-Augmented Generation (RAG)**.
+
+Unlike a standard chatbot, responses are grounded in hospital policy documents through **hybrid retrieval**, **reranking**, and **source attribution**, reducing hallucinations and improving answer quality.
+
 ---
 
 ## 🚀 Live Demo
 
-Experience the AI-powered Hospital Assistant built using Retrieval-Augmented Generation (RAG):
+🌐 **Streamlit App:** https://hospital-assistant-rag-v2.streamlit.app/
 
-👉 https://huggingface.co/spaces/NamithaC/Hospital-Assistant-RAG
-
-This system combines vector database retrieval with LLM-based generation to deliver context-aware medical responses.
-
-⚠️ Disclaimer: This project is for educational purposes only and should not be used for medical decision-making.
-
-# 🏥 Conversational Hospital Assistant RAG
-
-An AI-powered Hospital Assistant built using Retrieval-Augmented Generation (RAG) to answer hospital-related queries from PDF-based knowledge sources. The application combines semantic search, conversational memory, and Large Language Models (LLMs) to provide accurate, context-aware responses.
-
-Users can interact with the assistant through a Streamlit-based chat interface and receive answers grounded in hospital documents while maintaining conversational continuity across follow-up questions.
+📂 **Repository:** https://github.com/Namitha-C-Anto/hospital-assistant-rag-v2
 
 ---
 
-## 🚀 Features
+# Highlights
 
-* PDF document ingestion and processing
-* Text chunking using Recursive Character Text Splitter
-* Embedding generation using HuggingFace Embeddings
-* FAISS Vector Database for semantic similarity search
-* Conversational Retrieval-Augmented Generation (RAG)
-* Session-based chat memory for follow-up questions
-* Streamlit chat interface
-* Retrieved context visibility for transparency and debugging
-* Modular and scalable project architecture
+🚀 End-to-end conversational RAG application
+🔍 Hybrid retrieval using FAISS + BM25 + Reciprocal Rank Fusion (RRF)
+🎯 Cross-encoder reranking for improved retrieval quality
+📊 Integrated RAGAS evaluation framework
+💬 Multi-chat Streamlit interface with source attribution
+☁️ Deployed on Streamlit Community Cloud
+
+# Features
+
+### 💬 Conversational Chat Interface
+
+- Multi-chat support
+- Persistent conversation history
+- Create, switch, rename, and delete chats
+- Follow-up question support
 
 ---
 
-## 🏗️ Architecture
+### 🔍 Hybrid Retrieval
 
-```text
-PDF Documents
-      ↓
-    Loader
-      ↓
- Text Splitter
-      ↓
- Embeddings
-(HuggingFace)
-      ↓
-FAISS Vector Store
-      ↓
-   Retriever
-      ↓
-Retrieved Context
+Combines multiple retrieval techniques for improved recall.
 
- Chat Memory
-      ↓
+- FAISS Vector Search
+- BM25 Keyword Search
+- Reciprocal Rank Fusion (RRF)
+- Duplicate removal
 
-Prompt Template
-(Context + Memory + Question)
-      ↓
-      LLM
-      ↓
-   Response
+---
+
+### 🎯 Cross-Encoder Reranking
+
+Retrieved documents are reranked using
+
+**BAAI/bge-reranker-base**
+
+to improve context relevance before sending them to the LLM.
+
+---
+
+### 🤖 AI Answer Generation
+
+Responses are generated using OpenAI GPT models while grounding every answer in retrieved hospital documents.
+
+---
+
+### 📚 Source Transparency
+
+Every answer includes:
+
+- Source PDF
+- Page Number
+- Retrieved Context
+
+making the assistant easier to verify and debug.
+
+---
+
+# Architecture
+
+```
+                    User Question
+                          │
+                          ▼
+                 Conversation History
+                          │
+                          ▼
+                  Query Processing
+                          │
+          ┌───────────────┴───────────────┐
+          ▼                               ▼
+     FAISS Search                   BM25 Search
+          │                               │
+          └───────────────┬───────────────┘
+                          ▼
+              Reciprocal Rank Fusion
+                          │
+                          ▼
+                 Duplicate Removal
+                          │
+                          ▼
+              Cross-Encoder Reranker
+                          │
+                          ▼
+                Top Ranked Documents
+                          │
+                          ▼
+                  OpenAI GPT Model
+                          │
+                          ▼
+                 Answer + Source Chunks
 ```
 
+🏠 Home screen
+<img width="1158" height="566" alt="welcome_screen" src="https://github.com/user-attachments/assets/33b523b0-1e22-4bbc-afda-2af4603965c3" />
+
+💬 Chat conversation
+<img width="1165" height="570" alt="chat_interface" src="https://github.com/user-attachments/assets/2449d37b-3d92-45b0-880a-8d4b06d1df0c" />
+
+📚 Source panel
+<img width="1148" height="585" alt="source" src="https://github.com/user-attachments/assets/c0e48870-2446-4974-ad3b-6822a8639ed4" />
+
 ---
 
-## 📂 Project Structure
+# Tech Stack
 
-```text
-Hospital_Assistant/
+| Category | Technologies |
+|-----------|--------------|
+| Language | Python |
+| UI | Streamlit |
+| LLM | OpenAI GPT |
+| Framework | LangChain |
+| Embeddings | sentence-transformers |
+| Vector Database | FAISS |
+| Keyword Search | BM25 |
+| Hybrid Search | Ensemble + RRF |
+| Reranker | BAAI/bge-reranker-base |
+| Evaluation | RAGAS |
+| PDF Processing | PyMuPDF |
+| Version Control | Git & GitHub |
 
+---
+
+# Project Structure
+
+```
+Hospital_Assistant_v2.0
+│
 ├── app.py
-├── build_db.py
 ├── config.py
-├── requirements.txt
-├── README.md
 │
 ├── docs/
-│   ├── admission_and_discharge_process.pdf
-│   ├── appointment_booking_guide.pdf
-│   ├── department_directory.pdf
-│   ├── diagnostic_imaging_guide.pdf
-│   ├── hospital_services_brochure.pdf
-│   ├── infection_prevention_for_patients_and_visitors.pdf
-│   ├── laboratory_services_guide.pdf
-│   ├── patient_registration_guide.pdf
-│   ├── patient_rights_and_responsibilities.pdf
-│   ├── sunrise_multi_specialty_hospital.pdf
-│   └── visitor_guidelines.pdf
-│
 ├── db/
-│   └── faiss_index/
 │
 ├── rag/
-│   ├── loader.py
-│   ├── splitter.py
+│   ├── builder.py
+│   ├── initializer.py
+│   ├── pipeline.py
+│   ├── retrieval.py
+│   ├── reranker.py
 │   ├── vectorstore.py
-│   └── retriever.py
-│
-├── llm/
-│   └── llm.py
+│   └── ...
 │
 ├── memory/
-│   └── session_memory.py
 │
-└── prompts/
-    └── prompt_template.py
+├── ui/
+│
+├── prompts/
+│
+├── llm/
+│
+├── evaluate/
+│
+└── utils/
 ```
 
 ---
 
-## ⚙️ Technologies Used
+# Retrieval Pipeline
 
-* Python
-* LangChain
-* OpenAI GPT-4o Mini
-* HuggingFace Embeddings
-* FAISS Vector Database
-* Streamlit
-* Retrieval-Augmented Generation (RAG)
-* Conversational Memory
+1. User submits a question.
+2. Conversation history is formatted.
+3. FAISS retrieves semantically similar chunks.
+4. BM25 retrieves keyword-matching chunks.
+5. Results are merged using Reciprocal Rank Fusion.
+6. Duplicate chunks are removed.
+7. Cross-Encoder reranks the retrieved documents.
+8. Top-ranked contexts are passed to the LLM.
+9. Final answer is generated with supporting sources.
+
+---
+# 📊 RAG Evaluation
+
+This project includes an automated evaluation pipeline built with **RAGAS** to measure retrieval and generation quality across multiple retrieval strategies.
+
+## Evaluation Metrics
+
+The following metrics were used to evaluate the system:
+
+| Metric | Description |
+|---------|-------------|
+| **Faithfulness** | Measures whether the generated answer is supported by the retrieved context. |
+| **Answer Relevancy** | Measures how well the answer addresses the user's question. |
+| **Context Precision** | Measures the relevance of the retrieved documents. |
+| **Context Recall** | Measures whether the retrieval pipeline returned all required information. |
 
 ---
 
-## 🧠 Current Memory Implementation
+## Evaluation Dataset
 
-The application currently uses session-based conversational memory to maintain context throughout a user session.
-
-### Capabilities
-
-* Stores previous user questions and assistant responses
-* Supports follow-up questions using conversation history
-* Maintains conversational continuity across interactions
+- **Dataset:** Hospital Policy Dataset (dataset_v2)
+- **Test Questions:** 22
+- **Embedding Model:** sentence-transformers/all-mpnet-base-v2
+- **LLM:** GPT-4o-mini
+- **Judge Model:** GPT-5.4-mini
 
 ---
 
-## 🔧 Installation
+## Retrieval Strategy Comparison
 
-### Clone the Repository
+The RAG pipeline was evaluated using multiple retrieval configurations.
+
+| Retrieval Strategy | Faithfulness | Answer Relevancy | Context Precision | Context Recall |
+|--------------------|-------------:|-----------------:|------------------:|---------------:|
+| FAISS | 0.961 | 0.914 | 0.555 | 0.955 |
+| Hybrid (FAISS + BM25) | **1.000** | **0.968** | **1.000** | **1.000** |
+| Hybrid (No Reranker) | 0.875 | 0.968 | 0.833 | 1.000 |
+
+The experiments demonstrate that combining semantic search (FAISS) with keyword search (BM25) and Cross-Encoder reranking significantly improved retrieval quality compared to vector search alone.
+
+---
+
+## Evaluation Pipeline
+
+The evaluation framework automatically generates:
+
+- ✅ Per-question RAGAS metrics
+- ✅ Overall evaluation summaries
+- ✅ JSON experiment metadata
+- ✅ CSV reports
+- ✅ Retrieval latency metrics
+- ✅ Generation latency metrics
+- ✅ Token usage statistics
+- ✅ Experiment comparison reports
+
+---
+
+## Evaluation Artifacts
+
+The repository includes detailed evaluation outputs:
+
+```
+evaluate/
+└── evaluation_results/
+    ├── datasets/
+    ├── ragas_results/
+```
+
+These artifacts make it possible to compare different retrieval strategies, embedding models, chunking configurations, and reranking approaches.
+
+---
+
+
+# Running Locally
+
+Clone the repository
 
 ```bash
-git clone <your_repo_url>
-cd conversational-hospital-assistant-rag
+git clone https://github.com/Namitha-C-Anto/hospital-assistant-rag-v2.git
 ```
 
-### Create a Virtual Environment
+Create a virtual environment
 
 ```bash
 python -m venv .venv
 ```
 
-### Activate the Environment
+Activate
 
-**Windows**
+```bash
+source .venv/bin/activate
+```
+
+or
 
 ```bash
 .venv\Scripts\activate
 ```
 
-### Install Dependencies
+Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
+Create a `.env`
 
-## ▶️ Run Application
+```text
+OPENAI_API_KEY=your_key
+```
 
-The vector database will be automatically created if it does not already exist.
+Run
 
 ```bash
 streamlit run app.py
@@ -184,51 +304,42 @@ streamlit run app.py
 
 ---
 
-## 🎯 Example Questions
+# Future Improvements
 
-* How do I book an appointment at the hospital?
-* What documents are required for patient registration?
-* What services are available in the Radiology Department?
-* What laboratory services does the hospital provide?
-* What are the patient rights and responsibilities?
-* What are the hospital's visitor guidelines?
-* What infection prevention measures should patients and visitors follow?
-* What is the admission and discharge process?
-* Which departments are available in the hospital?
-* What diagnostic imaging services are offered?
-* Tell me about Sunrise Multi-Specialty Hospital.
-* What should I bring when visiting the hospital?
+- Qdrant Vector Database
+- Metadata Filtering
+- FastAPI Backend
+- Docker Deployment
+- Authentication
+- Agentic AI Workflows
+- Cloud Deployment
+- Observability with LangSmith
 
 ---
 
-## 🔮 Future Improvements
+# Key Learnings
 
-Planned enhancements include:
+This project explores several practical RAG engineering techniques including:
 
-* Buffer window memory (last N conversations)
-* Conversation summarization
-* Hybrid retrieval (Semantic Search + Keyword Search)
-* History-aware retrieval
-* SQL + PDF Router RAG
-* Advanced memory retrieval systems
-* Agent-based retrieval workflows
-* Deployment optimization
+- Hybrid Retrieval
+- Reciprocal Rank Fusion
+- Cross-Encoder Reranking
+- Retrieval Evaluation
+- Modular Pipeline Design
+- Conversation Memory
+- Streamlit UI Development
+- Production-style Project Organization
 
 ---
 
-## 👩‍💻 Author
+# Author
 
 **Namitha C Anto**
 
-SQL Backend Developer transitioning into AI Engineering, with a focus on:
+AI Engineer | Generative AI | RAG | Agentic AI
 
-* Retrieval-Augmented Generation (RAG)
-* Conversational AI
-* Agentic AI Systems
-* LLM Application Engineering
+GitHub:
+https://github.com/Namitha-C-Anto
 
----
-
-## ⭐ Project Goal
-
-The goal of this project is to build AI systems from foundational concepts rather than relying solely on high-level abstractions and frameworks. The focus is on developing a deep understanding of retrieval systems, conversational memory, orchestration, and production-oriented AI engineering practices.
+LinkedIn:
+https://www.linkedin.com/in/namitha-c-anto-79442b103
