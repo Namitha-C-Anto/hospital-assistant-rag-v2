@@ -1,0 +1,146 @@
+{
+    "experiment": {
+        "experiment": "all-mpnet-base-v2_chunk700_overlap150_k15_fetch30_lambda0.4_mmr_rerank5_bge-reranker-base",
+        "run_date": "2026-07-03 21:05:35",
+        "dataset": "dataset_v2",
+        "embedding_model": "sentence-transformers/all-mpnet-base-v2",
+        "chunk_size": 700,
+        "chunk_overlap": 150,
+        "search_type": "mmr",
+        "top_k": 15,
+        "fetch_k": 30,
+        "lambda_mult": 0.4,
+        "use_reranker": true,
+        "reranker_model": "BAAI/bge-reranker-base",
+        "reranker_top_n": 5,
+        "generation_llm": "gpt-4o-mini",
+        "judge_llm": "gpt-5.4-mini"
+    },
+    "results": [
+        {
+            "question": "What are the five strategic objectives of an effective admissions and discharge policy?",
+            "retrieval": {
+                "faiss": [
+                    {
+                        "rank": 1,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 1,
+                        "content": "Admissions and Discharge Guidelines Health Strategy Implementation Project 2003"
+                    },
+                    {
+                        "rank": 2,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 17,
+                        "content": "admission to more rigorous assessment to ensure the appropriateness of hospital admission and to maximise the number of beds available for elective admissions. The philosophy of care must shift emphasis from admission to assessment to ensure appropriateness of admission and maximise bed availability for elective admissions. Admissions and Discharge Guidelines - 16"
+                    },
+                    {
+                        "rank": 3,
+                        "source": "hospital_collection.pdf",
+                        "page": 1,
+                        "content": "clear and consistent guidelines for conducting billing and collections functions in a manner that promotes compliance, patient satisfaction, and efficiency. Through the use of billing statements, written correspondence, and phone calls, Major Hospital will make diligent efforts to inform patients of their financial responsibilities and available financial assistance options, as well as follow up with patients regarding outstanding accounts. Additionally, this Policy requires Major Hospital to make reasonable efforts to determine a patient’s eligibility for financial assistance before engaging in Extraordinary Collection Actions to obtain payment. This Policy applies to all sums due from"
+                    },
+                    {
+                        "rank": 4,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 9,
+                        "content": "Strategic objectives The key strategic objectives underpinning an effective and coherent admissions and discharge policy for emergency and elective patients are: • The provision of an integrated personal health and social services system resulting in seamless patient centred care at all times. • The utilisation of resources to maximise clinical and organisational effectiveness and outcomes. • The establishment of fully integrated networks of acute care which are accessible to each person. • The provision of levels of local access to acute care whilst at the same time ensuring high quality clinical care. • The acquisition of clinical admissions data to assist service planning and monitoring."
+                    },
+                    {
+                        "rank": 5,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 20,
+                        "content": "pre-admission. On admission, the patient’s pre-morbid and functional status information are documented in order to inform discharge planning and to identify patients at risk on returning home. In this way, referrals to inter-hospital and community services are initiated in a timely manner. What are the principles of effective discharge planning? The core principles for effective discharge planning are: • A patient’s use of a hospital bed and their discharge should be planned before their admission, where possible. • The estimated date of discharge should be documented and communicated to the patient and relevant personnel within 24 hours of admission. • Discharge should be “streamlined”"
+                    },
+                    {
+                        "rank": 6,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 25,
+                        "content": "Admissions and Discharge Guidelines - 24"
+                    },
+                    {
+                        "rank": 7,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 9,
+                        "content": "whilst at the same time ensuring high quality clinical care. • The acquisition of clinical admissions data to assist service planning and monitoring. Admissions and Discharge Guidelines - 8"
+                    },
+                    {
+                        "rank": 8,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 22,
+                        "content": "to our patients. Therefore it is strongly recommended that services should be delivered in adherence to these guidelines. It is now planned that they will be used as a measurement tool to evaluate the effectiveness of admissions and discharges nationally and the outcomes achieved relative to the aims set out in the document. Admissions and Discharge Guidelines - 21"
+                    },
+                    {
+                        "rank": 9,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 19,
+                        "content": "at the time of their admission, and to ensure that patients are cared for by staff with the appropriate expertise. What are the key processes for effective elective admissions? The following key requirements have been identified to facilitate effective elective admission practices: • Centralised waiting list management and agreement on the parameters for scheduling theatre lists with clinicians. • Pre-admission assessment should be a standard requirement for all elective admissions to ensure appropriate planning of the entire patient journey. Admissions and Discharge Guidelines - 18"
+                    },
+                    {
+                        "rank": 10,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 11,
+                        "content": "The active management of admissions and discharges should ensure that: • Beds are available for emergency admissions. • Beds are available for elective patients; this assists in keeping waiting lists down. • The quality and appropriateness of patient care is high. • Patients get the care they require when they are discharged from hospital. • Scarce financial resources are not wasted and value for money is achieved.4 Quality and safety To ensure that all patients admitted to hospital receive the high quality and safe service to which they are entitled, resources must be efficiently and effectively utilised. Services are organised so that patients, depending on their needs, can move smoothly"
+                    },
+                    {
+                        "rank": 11,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 6,
+                        "content": "are not intended to be prescriptive rather they should act as a reference or guide to people working within the system, supporting the overall commitment to delivering better quality health services. Finally, I would like to thank the project team who, in consultation with a wide range of people, produced these guidelines. Denis Doherty Director The Health Boards Executive Admissions and Discharge Guidelines - 5"
+                    },
+                    {
+                        "rank": 12,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 10,
+                        "content": "What are the Principles Underpinning Best Practice in Hospital Admissions? A number of principles should underpin the development of an effective emergency and elective admissions and discharge planning function. These include: • The provision of patient centred services, which are accessible to the population without compromising safety, quality and clinical standards, to the right people in the right location and at the right time.1 • Patients should be consulted and included in all decisions about their care. • Clinical practice and care should be based on the most up to date evidence. • Co-operation and clinical networking between hospitals and between care groups are essential to"
+                    },
+                    {
+                        "rank": 13,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 16,
+                        "content": "effective service delivery, including: - Referral guidelines and protocols for consultant care and diagnostic services. - Discharge plans agreed between the hospital and a key worker in primary care. - Discharge planning that commences on day of admission. - Efficient communication from acute care service providers e.g. discharge letter accompany patient or/and e-mailed to GPs and key worker on or before the day of discharge. - Integrated care pathways facilitated by key workers. - Individual care plans appropriate to the needs of the patient and their carers are developed by the multidisciplinary team and in collaboration with them e.g. chronic disease management. - Shared care"
+                    },
+                    {
+                        "rank": 14,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 12,
+                        "content": "balance and monitor the competing demands of emergency and elective pressures ensuring all bed and theatre resources are fully utilised.8 Discharge planning Discharge from hospital is a process, not an isolated event. It involves the development and implementation of a plan to facilitate the transfer of an individual from hospital to an alternative setting where appropriate. Components of the system (family, carers, hospitals, primary care providers, community services and social services) must work together. Activity and performance standards should be frequently monitored and there should be openness to innovative solutions. This will ensure that the whole systems approach to admissions"
+                    },
+                    {
+                        "rank": 15,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 7,
+                        "content": "Strategy, Quality and Fairness (DOHC 2001) which states, among other things, that “The discharge planning function in each acute hospital will be enhanced to ensure that patients do not have to remain in hospital for any longer than necessary” (Action 84) 1 “Admission protocols will ensure that emergency patients will be the only group of patients admitted to the hospital through the A & E Department” (Action 86)1 This document is based on international best practice, focusing on a “whole systems approach” to effectively address elective and emergency admissions and discharges. Grounded in the principle of “people-centredness” which, increasingly, influences the planning and delivery of"
+                    }
+                ],
+                "reranked": [
+                    {
+                        "rank": 1,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 9,
+                        "content": "Strategic objectives The key strategic objectives underpinning an effective and coherent admissions and discharge policy for emergency and elective patients are: • The provision of an integrated personal health and social services system resulting in seamless patient centred care at all times. • The utilisation of resources to maximise clinical and organisational effectiveness and outcomes. • The establishment of fully integrated networks of acute care which are accessible to each person. • The provision of levels of local access to acute care whilst at the same time ensuring high quality clinical care. • The acquisition of clinical admissions data to assist service planning and monitoring."
+                    },
+                    {
+                        "rank": 2,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 20,
+                        "content": "pre-admission. On admission, the patient’s pre-morbid and functional status information are documented in order to inform discharge planning and to identify patients at risk on returning home. In this way, referrals to inter-hospital and community services are initiated in a timely manner. What are the principles of effective discharge planning? The core principles for effective discharge planning are: • A patient’s use of a hospital bed and their discharge should be planned before their admission, where possible. • The estimated date of discharge should be documented and communicated to the patient and relevant personnel within 24 hours of admission. • Discharge should be “streamlined”"
+                    },
+                    {
+                        "rank": 3,
+                        "source": "admission_and_discharge_guidelines_2003.pdf",
+                        "page": 11,
+                        "content": "The active management of admissions and discharges should ensure that: • Beds are available for emergency admissions. • Beds are available for elective patients; this assists in keeping waiting lists down. • The quality and appropriateness of patient care is high. • Patients get the care they require when they are discharged from hospital. • Scarce financial resources are not wasted and value for money is achieved.4 Quality and safety To ensure that all patients admitted to hospital receive the high quality and safe service to which they are entitled, resources must be efficiently and effectively utilised. Services are organised so that patients, depending on their needs, can move smoothly"
+                    }
+                ]
+            },
+            "answer": "The five strategic objectives of an effective admissions and discharge policy are:\n\n1. The provision of an integrated personal health and social services system resulting in seamless patient centred care at all times.\n2. The utilisation of resources to maximise clinical and organisational effectiveness and outcomes.\n3. The establishment of fully integrated networks of acute care which are accessible to each person.\n4. The provision of levels of local access to acute care whilst at the same time ensuring high quality clinical care.\n5. The acquisition of clinical admissions data to assist service planning and monitoring.",
+            "reference": "The objectives are to provide integrated patient-centred care, maximize clinical and organizational effectiveness, establish integrated acute care networks, ensure local access with high-quality care, and acquire admissions data for planning and monitoring.",
+            "metrics": {
+                "faithfulness": 1.0,
+                "answer_relevancy": 1.0,
+                "context_precision": 0.9999999999666667,
+                "context_recall": 1.0
+            }
+        }
+    ]
+}

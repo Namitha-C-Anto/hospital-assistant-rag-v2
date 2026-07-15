@@ -1,104 +1,146 @@
 import os
 import streamlit as st
-from config import DB_PATH, APP_TITLE, SUB_TITLE
-from rag.vectorstore import load_vectorstore
-from rag.retriever import create_retriever
-from llm.llm import get_llm
-from prompts.prompt_template import prompt
-from memory.session_memory import get_chat_history, save_chat
-from rag.reranker import reranker
+from config import (
+    DB_PATH, 
+    APP_TITLE, 
+    WELCOME_TITLE,
+    WELCOME_SUBTITLE,
+    WELCOME_CAPTION,)
+from ui import example_questions
+from utils.logger import logger     
+from rag.pipeline import run_rag_pipeline  
+from rag.initializer import initialize_rag 
 
-if not os.path.exists(DB_PATH):
-    import build_db
+from memory.chat_manager import (
+    initialize_chat_sessions,
+    rename_chat,
+    get_chat_history, 
+    format_chat_history, 
+    save_chat,
+    switch_chat,
+    list_chats,)
+from rag.builder import build_vector_database
+from rag.models import PipelineComponents
+from ui.styles import load_css
+from ui.sidebar import render_sidebar
+from ui.welcome import render_welcome
+from ui.example_questions import render_example_questions
+from ui.sources import render_sources
+
+load_css()
+# -------------------------------------------------
+# Load and cache initialized RAG components.
+# This prevents reloading the vector database and
+# models on every Streamlit rerun.
+# -------------------------------------------------
+@st.cache_resource
+def load_rag_components() -> PipelineComponents:
+    logger.info("Initializing RAG components...")  
+    return initialize_rag()
+
+def main() -> None:
+    """
+    Run the Streamlit Hospital Policy RAG application.
+    """
     
-st.title(APP_TITLE)
-st.caption(SUB_TITLE)
-
-vectorstore = load_vectorstore()
-retriever = create_retriever(vectorstore)
-
-llm = get_llm()
-
-chat_history = get_chat_history()
-
-for chat in chat_history:
-
-    with st.chat_message("user"):
-
-        st.write(
-            chat["question"]
-        )
-    with st.chat_message("assistant"):
-
-        st.write(
-            chat["answer"]
-        )
-
-question = st.chat_input(
-    "Ask your hospital-related question"
-)
-
-if question:
-
-    history_text = "\n".join(
-        f"Human: {chat['question']}\n AI: {chat['answer']}"
-
-        for chat in chat_history
-    )
-
-    results = retriever.invoke(
-        question.strip().upper()
-    )
-
-    # Rerank them
-    reranked_results = reranker.compress_documents(
-        documents=results,
-        query=question
-    )
-
-    context = "\n\n".join(
+    #Step 1: Initialize the session state
+    initialize_chat_sessions()
         
-        doc.page_content 
-
-        for doc in reranked_results
-    )
-
-    messages = prompt.format_messages(
-        context = context,
-        question = question,
-        chat_history = history_text
-    )
-
-    response = llm.invoke(
-        messages
-        )
-
-    with st.chat_message("user"):
-
-        st.write(question)
-
-    with st.chat_message("assistant"):
-
-        st.write(response.content)
-  
-    save_chat(question, response.content)
-
-    with st.expander("Retrieved Context"):
+    # -------------------------------------------------
+    # Create the vector database on first launch if it
+    # does not already exist.
+    # -------------------------------------------------
+    if not os.path.exists(DB_PATH):
+        build_vector_database()
         
-        for doc in results:
-            
-            pdf_name = os.path.basename(
-                doc.metadata.get("source", "Unknown PDF")
-            ) 
-            
-            page_no = doc.metadata.get("page", "Unknown Page")
-            
-            st.write(
-                f"📄 PDF: {pdf_name}"
+    # -------------------------------------------------
+    # Display the Side bar
+    # -------------------------------------------------
+    with st.sidebar:
+        render_sidebar()
+        
+        if "last_pipeline_result" in st.session_state:
+            render_sources(
+                st.session_state.last_pipeline_result
             )
+    # -------------------------------------------------
+    # Load cached RAG components.
+    # -------------------------------------------------
+    rag_components = load_rag_components()
+
+    # -------------------------------------------------
+    # Restore and display previous chat messages.
+    # -------------------------------------------------
+    chat_history = get_chat_history()
+
+    if not chat_history:
+        render_welcome()
+
+    for chat in chat_history:
+
+        with st.chat_message("user"):
             st.write(
-                f"📍Page: {page_no}"
+                chat["question"]
+            )
+        with st.chat_message("assistant"):
+            st.write(
+                chat["answer"]
             )
 
-            st.write(doc.page_content[:500])
-            st.divider()
+    #------------------------------------------------------------    
+    if not chat_history:
+        st.markdown("##### 💡 Try asking")
+        
+        example_questions = render_example_questions()
+        columns = st.columns(2)
+
+        for i, q in enumerate(example_questions):
+            with columns[i % 2]:
+                if st.button(q, use_container_width=True):
+                    st.session_state.selected_question = q
+
+    # -------------------------------------------------
+    # Accept a new user question.
+    # -------------------------------------------------
+    question = st.chat_input(
+        "Ask your hospital-related question"
+    )
+
+    # If an example question was clicked, use it instead
+    if "selected_question" in st.session_state:
+        question = st.session_state.pop("selected_question")
+
+    if question:
+         
+        logger.info(f"Processing question: {question}")
+
+        # -------------------------------------------------
+        # Format conversation history and execute the
+        # complete RAG pipeline.
+        # -------------------------------------------------
+        history_text = format_chat_history(chat_history)
+
+        # -------------------------------------------------
+        # Display the latest conversation.
+        # -------------------------------------------------
+        with st.chat_message("user"):
+            st.write(question)
+        
+        with st.chat_message("assistant"):
+            with st.spinner("Searching and generating answer..."):
+                pipeline_result = run_rag_pipeline(
+                    question,
+                    rag_components,
+                    chat_history=history_text,
+                )
+            st.write(pipeline_result.answer)
+            st.session_state.last_pipeline_result = pipeline_result
+    
+        # Save conversation for future turns.
+        save_chat(question, pipeline_result.answer)
+        rename_chat(question)
+                  
+        st.rerun()
+            
+if __name__ == "__main__":
+    main()
