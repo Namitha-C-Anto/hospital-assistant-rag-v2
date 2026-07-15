@@ -354,6 +354,8 @@ This project explores several practical RAG engineering techniques including:
 - Authentication
 - Docker deployment
 ---
+Note: This project uses the OpenAI API for answer generation. If the live demo is temporarily unavailable due to API quota limits, the repository includes evaluation results, screenshots, and deployment instructions. A demo video is also provided to showcase the application's functionality.
+---
 # Author
 
 **Namitha C Anto**
