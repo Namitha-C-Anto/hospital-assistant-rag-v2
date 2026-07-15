@@ -331,7 +331,29 @@ This project explores several practical RAG engineering techniques including:
 - Production-style Project Organization
 
 ---
+## Roadmap
 
+### Version 1
+- Basic RAG pipeline
+- FAISS retrieval
+- Streamlit interface
+
+### Version 2 (Current)
+- Hybrid retrieval (FAISS + BM25)
+- Reciprocal Rank Fusion
+- Optional Cross-Encoder reranking
+- Source attribution
+- RAGAS evaluation
+- Modular architecture
+
+### Version 3 (Planned)
+- Qdrant vector database
+- Metadata filtering
+- Self-query retriever
+- FastAPI backend
+- Authentication
+- Docker deployment
+---
 # Author
 
 **Namitha C Anto**
@@ -343,3 +365,4 @@ https://github.com/Namitha-C-Anto
 
 LinkedIn:
 https://www.linkedin.com/in/namitha-c-anto-79442b103
+
