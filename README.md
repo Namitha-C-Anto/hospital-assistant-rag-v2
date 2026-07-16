@@ -13,6 +13,11 @@ Unlike a standard chatbot, responses are grounded in hospital policy documents t
 📂 **Repository:** https://github.com/Namitha-C-Anto/hospital-assistant-rag-v2
 
 ---
+## 🎥 Demo
+
+https://github.com/user-attachments/assets/7e12e290-b7b6-4466-bd94-2b07c6286b42
+
+---
 
 # Highlights
 
