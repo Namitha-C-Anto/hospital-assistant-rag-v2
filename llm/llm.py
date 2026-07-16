@@ -1,16 +1,25 @@
 from langchain_openai import ChatOpenAI
-from config import (
-    OPENAI_API_KEY, 
-    TEMPERATURE, 
-    LLM_MODEL,)
+from langchain_groq import ChatGroq
 
-def get_llm()-> ChatOpenAI:
-    """
-    Create and return the configured ChatOpenAI model.
-    """
-        
+from config import TEMPERATURE, LLM_MODEL, OPENAI_API_KEY, GROQ_API_KEY
+
+
+def get_llm(
+    provider: str = "openai",
+    model: str | None = None,
+    api_key: str | None = None,
+):
+    provider = provider.lower()
+
+    if provider == "groq":
+        return ChatGroq(
+            model=model,
+            api_key=api_key or GROQ_API_KEY,
+            temperature=TEMPERATURE,
+        )
+
     return ChatOpenAI(
-        model=LLM_MODEL,
-        api_key=OPENAI_API_KEY,
-        temperature=TEMPERATURE
+        model=model or LLM_MODEL,
+        api_key=api_key or OPENAI_API_KEY,
+        temperature=TEMPERATURE,
     )

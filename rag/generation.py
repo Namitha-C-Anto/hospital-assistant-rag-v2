@@ -1,6 +1,6 @@
 import time
 from typing import Any
-from prompts.prompt_template import prompt
+from prompts.prompt_template import prompt 
 
 def generate_answer(
     question: str,
@@ -42,6 +42,7 @@ def generate_answer(
     # Generate the response from the LLM.
     # -------------------------------------------------
     generation_start = time.perf_counter()
+    
     response = app_llm.invoke(messages)
     generation_time = round(time.perf_counter() - generation_start,4)
     

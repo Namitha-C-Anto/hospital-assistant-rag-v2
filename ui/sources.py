@@ -24,27 +24,27 @@ def render_sources(last_pipeline_result):
             "content": document.content
         })
 
-    st.markdown("### 📚 Sources")
+    with st.expander("📚 Retrieved Sources", expanded=False):
 
-    for pdf_name, chunks in grouped.items():
+        for pdf_name, chunks in grouped.items():
 
-        display_name = (
-            os.path.splitext(pdf_name)[0]
-            .replace("_", " ")
-            .title()
-        )
+            display_name = (
+                os.path.splitext(pdf_name)[0]
+                .replace("_", " ")
+                .title()
+            )
 
-        with st.expander(
-            f"📄 {display_name} ({len(chunks)} chunks)",
-            expanded=False,
-        ):
+            with st.expander(
+                f"📄 {display_name} ({len(chunks)} chunks)",
+                expanded=False,
+            ):
 
-            for chunk in chunks:
+                for chunk in chunks:
 
-                st.caption(
-                    f"Rank {chunk['rank']} • Page {chunk['page']}"
-                )
+                    st.caption(
+                        f"Rank {chunk['rank']} • Page {chunk['page']}"
+                    )
 
-                st.caption(chunk["content"][:200])
+                    st.caption(chunk["content"][:200])
 
-                st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)

@@ -8,11 +8,20 @@ from memory.chat_manager import (
 def render_sidebar() -> None:
     st.markdown(APP_TITLE, unsafe_allow_html=True)
 
+    # -----------------------------
+    # New Chat
+    # -----------------------------
+
     #Step 2: Create a new chat
-    if st.button("＋  New chat", use_container_width=True):
-        
+    if st.button(
+        "➕ New Chat",
+        use_container_width=True,
+        type="primary",
+    ):        
         switch_chat(None)
         st.rerun()
+
+
 
     with st.expander("Recent", expanded=True):
 
@@ -39,8 +48,7 @@ def render_sidebar() -> None:
                 st.rerun()
 
         if st.session_state.current_chat is not None:
-            st.divider()
-            st.caption(" ")
+            st.divider() 
 
             if st.button(
                 "🗑️ Delete Chat",
@@ -63,3 +71,54 @@ def render_sidebar() -> None:
                     if st.button("Cancel"):
                         st.session_state.confirm_delete = False
                         st.rerun()
+
+    # ---------------------------------------------------
+    # Settings
+    # ---------------------------------------------------
+
+    with st.expander("⚙️ Settings"):
+
+        provider = st.selectbox(
+            "LLM Provider",
+            ["OpenAI", "Groq"],
+            key="llm_provider",
+        )
+        st.session_state["provider"] = provider.lower()
+
+        if provider == "OpenAI":
+            model = st.selectbox(
+                "Model",
+                [
+                    "gpt-4o-mini",
+                    "gpt-5.4-mini",
+                ],
+                key="llm_model",
+            )
+
+            api_key = st.text_input(
+                "OpenAI API Key",
+                type="password",
+                key="openai_api_key",
+                placeholder="sk-...",
+            )
+
+        else:
+            model = st.selectbox(
+                "Model",
+                [
+                    "llama-3.3-70b-versatile",
+                    "meta-llama/llama-4-scout-17b-16e-instruct",
+                    "qwen/qwen3-32b",
+                ],
+                key="llm_model",
+            )
+
+            api_key = st.text_input(
+                "Groq API Key",
+                type="password",
+                key="groq_api_key",
+                placeholder="gsk_...",
+            )
+        st.session_state["model"] = model
+        st.session_state["api_key"] = api_key
+ 

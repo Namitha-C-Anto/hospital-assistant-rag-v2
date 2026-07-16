@@ -3,173 +3,167 @@ import pandas as pd
 import plotly.express as px
 
 st.set_page_config(
-    page_title="RAGAS Evaluation Dashboard",
-    layout="wide"
+    page_title="RAGAS Evaluation Summary",
+    layout="wide",
 )
 
-st.title("📊 RAGAS Evaluation Dashboard")
+st.title("📊 RAG Evaluation Summary")
 
-csv_path = "ragas_results/all-mpnet-base-v2_chunk800_overlap200_k15_fetch30_lambda0.4_mmr_rerank5_bge-reranker-base_2026-06-30_12_56_55.csv"
+# --------------------------------------------------------
+# Load comparison CSV
+# --------------------------------------------------------
 
-try:
-    df = pd.read_csv(csv_path)
+csv_path = "evaluate/evaluation_results/experiment_summary.csv"
 
-    st.success("RAGAS results loaded successfully!")
+df = pd.read_csv(csv_path)
 
-    # ---------------------------------------------------
-    # Experiment Summary
-    # ---------------------------------------------------
+metrics = [
+    "faithfulness",
+    "answer_relevancy",
+    "context_precision",
+    "context_recall",
+]
 
-    st.header("Experiment Configuration")
+df = df.dropna(subset=metrics)
 
-    config_cols = st.columns(4)
+# --------------------------------------------------------
+# Select representative experiments
+# --------------------------------------------------------
 
-    config_cols[0].metric("Embedding", df["embedding_model"].iloc[0])
-    config_cols[1].metric("Search", df["search_type"].iloc[0])
-    config_cols[2].metric("LLM", df["generation_llm"].iloc[0])
-    config_cols[3].metric("Judge", df["judge_llm"].iloc[0])
+selected = [
+     "faiss_20260706_214041_reranker",
+    "hybrid_20260706_215506_no_reranker",
+    "hybrid_20260706_215133_reranker",
+]
 
-    config_cols = st.columns(6)
+comparison = (
+    df[df["experiment"].isin(selected)]
+    .copy()
+)
 
-    config_cols[0].metric("Chunk Size", int(df["chunk_size"].iloc[0]))
-    config_cols[1].metric("Overlap", int(df["chunk_overlap"].iloc[0]))
-    config_cols[2].metric("Top K", int(df["top_k"].iloc[0]))
-    config_cols[3].metric("Fetch K", int(df["fetch_k"].iloc[0]))
-    config_cols[4].metric("Lambda", df["lambda_mult"].iloc[0])
-    config_cols[5].metric(
-        "Reranker",
-        "Yes" if df["use_reranker"].iloc[0] else "No"
-    )
+comparison["Method"] = comparison["experiment"].map({
+    "faiss_20260706_214041_reranker": "FAISS",
+    "hybrid_20260706_215506_no_reranker": "Hybrid",
+    "hybrid_20260706_215133_reranker": "Hybrid + Reranker",
+})
 
-    if df["use_reranker"].iloc[0]:
-        st.info(
-            f"Reranker Model: {df['reranker_model'].iloc[0]} "
-            f"(Top {df['reranker_top_n'].iloc[0]})"
-        )
+comparison = comparison.sort_values(
+    "Method",
+    key=lambda s: s.map({
+        "FAISS": 0,
+        "Hybrid": 1,
+        "Hybrid + Reranker": 2,
+    }),
+)
 
-    st.divider()
+# --------------------------------------------------------
+# Compact Experiment Summary
+# --------------------------------------------------------
 
-    # ---------------------------------------------------
-    # Metrics
-    # ---------------------------------------------------
+st.caption(
+    f"""
+**Dataset:** {comparison['dataset'].iloc[0]} &nbsp;&nbsp;•&nbsp;&nbsp;
+**Questions:** {int(comparison['total_questions'].max())} &nbsp;&nbsp;•&nbsp;&nbsp;
+**Embedding:** {comparison['embedding_model'].iloc[0].split('/')[-1]} &nbsp;&nbsp;•&nbsp;&nbsp;
+**LLM:** {comparison['generation_llm'].iloc[0]} &nbsp;&nbsp;•&nbsp;&nbsp;
+**Judge:** {comparison['judge_llm'].iloc[0]}
+"""
+)
 
-    metric_columns = [
-        col
-        for col in [
-            "faithfulness",
-            "answer_relevancy",
-            "context_precision",
-            "context_recall"
-        ]
-        if col in df.columns
+st.divider()
+
+# --------------------------------------------------------
+# Evaluation Table
+# --------------------------------------------------------
+
+display = comparison[
+    [
+        "Method",
+        "faithfulness",
+        "answer_relevancy",
+        "context_precision",
+        "context_recall",
     ]
+].round(3)
 
-    averages = df[metric_columns].mean().round(3)
+display.columns = [
+    "Method",
+    "Faithfulness",
+    "Answer Relevancy",
+    "Context Precision",
+    "Context Recall",
+]
 
-    st.header("Average RAGAS Scores")
+st.subheader("RAGAS Evaluation")
 
-    cols = st.columns(len(metric_columns))
+st.dataframe(
+    display,
+    use_container_width=True,
+    hide_index=True,
+)
 
-    for i, metric in enumerate(metric_columns):
-        cols[i].metric(metric.replace("_", " ").title(), averages[metric])
+# --------------------------------------------------------
+# Comparison Chart
+# --------------------------------------------------------
 
-    st.divider()
+plot_df = display.melt(
+    id_vars="Method",
+    var_name="Metric",
+    value_name="Score",
+)
 
-    # ---------------------------------------------------
-    # Average Chart
-    # ---------------------------------------------------
+fig = px.bar(
+    plot_df,
+    x="Metric",
+    y="Score",
+    color="Method",
+    barmode="group",
+    text="Score",
+    range_y=[0, 1],
+)
 
-    avg_df = averages.reset_index()
-    avg_df.columns = ["Metric", "Score"]
+fig.update_traces(
+    texttemplate="%{text:.3f}",
+    textposition="outside",
+)
 
-    fig = px.bar(
-        avg_df,
-        x="Metric",
-        y="Score",
-        text="Score",
-        range_y=[0, 1],
-        title="Average Metric Scores"
-    )
+fig.update_layout(
+    height=450,
+    xaxis_title="",
+    yaxis_title="Score",
+    legend_title="",
+)
 
-    fig.update_traces(texttemplate="%{text:.3f}")
+st.plotly_chart(fig, use_container_width=True)
 
-    st.plotly_chart(fig, use_container_width=True)
+st.divider()
 
-    st.divider()
+# --------------------------------------------------------
+# Performance
+# --------------------------------------------------------
 
-    # ---------------------------------------------------
-    # Per Question
-    # ---------------------------------------------------
+performance = comparison[
+    [
+        "Method",
+        "avg_pipeline_latency",
+        "avg_retrieval_latency",
+        "avg_generation_latency",
+        "avg_total_tokens",
+    ]
+].round(2)
 
-    st.header("Per Question Analysis")
+performance.columns = [
+    "Method",
+    "Pipeline (s)",
+    "Retrieval (s)",
+    "Generation (s)",
+    "Tokens",
+]
 
-    selected_metric = st.selectbox(
-        "Choose Metric",
-        metric_columns
-    )
+st.subheader("Performance")
 
-    fig = px.bar(
-        df,
-        x="user_input",
-        y=selected_metric,
-        color=selected_metric,
-        range_color=[0, 1],
-        hover_data=["response"],
-        title=f"{selected_metric.replace('_',' ').title()} by Question"
-    )
-
-    fig.update_layout(xaxis_tickangle=-40)
-
-    st.plotly_chart(fig, use_container_width=True)
-
-    st.divider()
-
-    # ---------------------------------------------------
-    # Lowest Scoring Questions
-    # ---------------------------------------------------
-
-    st.header("Lowest Scoring Questions")
-
-    metric = st.selectbox(
-        "Find lowest scores for",
-        metric_columns,
-        key="lowest_metric"
-    )
-
-    lowest = (
-        df[["user_input", metric]]
-        .sort_values(metric)
-        .head(10)
-    )
-
-    st.dataframe(lowest, use_container_width=True)
-
-    st.divider()
-
-    # ---------------------------------------------------
-    # Search Question
-    # ---------------------------------------------------
-
-    st.header("Search Questions")
-
-    search = st.text_input("Search")
-
-    filtered = df
-
-    if search:
-        filtered = df[
-            df["user_input"].str.contains(
-                search,
-                case=False,
-                na=False
-            )
-        ]
-
-    st.dataframe(
-        filtered,
-        use_container_width=True,
-        height=450
-    )
-
-except FileNotFoundError:
-    st.error("CSV file not found.")
+st.dataframe(
+    performance,
+    use_container_width=True,
+    hide_index=True,
+)

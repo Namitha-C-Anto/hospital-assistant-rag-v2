@@ -1,6 +1,8 @@
+import streamlit as st
 from rag.models import PipelineComponents, RagPipelineResult
 from rag.retrieval import run_retrieval_pipeline
 from rag.generation import generate_answer
+from llm.llm import get_llm
 
 def run_rag_pipeline(
     question: str,
@@ -40,16 +42,27 @@ def run_rag_pipeline(
         document.content
         for document in retrieval_result.reranked_documents
         )
+    
+    # -------------------------------------------------
+    # 2. Create the selected LLM
+    # -------------------------------------------------
+    app_llm = get_llm(
+        provider=st.session_state.get("provider", "openai"),
+        model=st.session_state.get("model"),
+        api_key=st.session_state.get("api_key"),
+    )
+    if app_llm is None:
+        app_llm = rag_components.app_llm
 
     # -------------------------------------------------
-    # 2. Generate answer using the application LLM
-    # -------------------------------------------------    
+    # 3. Generate answer
+    # -------------------------------------------------
     answer, usage, prompt_time, generation_time = generate_answer(
-            question,
-            context_text,
-            rag_components.app_llm,
-            chat_history,
-        )
+        question,
+        context_text,
+        app_llm,
+        chat_history,
+    )
 
     return RagPipelineResult(
         answer=answer,

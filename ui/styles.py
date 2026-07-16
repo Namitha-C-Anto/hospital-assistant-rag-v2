@@ -3,9 +3,22 @@ import streamlit as st
 def load_css() -> None:
     """Load custom CSS used by the application."""
 
+
     st.markdown("""
     <style>
+    /* ---------- Sidebar Padding ---------- */
 
+    section[data-testid="stSidebar"] > div:first-child {
+        padding-top: 0.8rem !important;
+    }
+    /* ---------- App Title ---------- */
+
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3 {
+        margin-top: 0 !important;
+        margin-bottom: 0.5rem !important;
+    }
     /* ---------- Sidebar Buttons ---------- */
 
     section[data-testid="stSidebar"] div[data-testid="stButton"] > button {

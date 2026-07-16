@@ -26,6 +26,7 @@ from ui.sidebar import render_sidebar
 from ui.welcome import render_welcome
 from ui.example_questions import render_example_questions
 from ui.sources import render_sources
+from llm.llm import get_llm
 
 load_css()
 # -------------------------------------------------
@@ -128,6 +129,7 @@ def main() -> None:
         
         with st.chat_message("assistant"):
             with st.spinner("Searching and generating answer..."):
+                
                 pipeline_result = run_rag_pipeline(
                     question,
                     rag_components,
