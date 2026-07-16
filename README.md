@@ -15,7 +15,7 @@ Unlike a standard chatbot, responses are grounded in hospital policy documents t
 ---
 ## 🎥 Demo
 
-https://github.com/user-attachments/assets/7e12e290-b7b6-4466-bd94-2b07c6286b42
+https://github.com/user-attachments/assets/dd7e4bf1-449b-48c5-892f-ce10451be780
 
 ---
 
